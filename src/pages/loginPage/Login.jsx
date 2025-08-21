@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { useAuth } from "../context/AuthContext";
+import axios from "axios";
+import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
 export default function Login() {
@@ -9,14 +10,30 @@ export default function Login() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
   const [erro, setErro] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    const sucesso = login(email, senha);
-    if (sucesso) {
+    setErro("");
+    setLoading(true);
+
+    try {
+      
+      const res = await axios.post("http://localhost:3000/user/login", { email, senha, })
+      const data = await res.data;
+
+      // Aqui salvamos no contexto o token e o user retornados
+      login({ token: data.token, user: data.user });
+
       navigate("/dashboard");
-    } else {
-      setErro("Email ou senha incorretos");
+    } catch (error) {
+      if (error.response) {
+        setErro(error.response.data.message || "Email ou senha inválidos");
+      } else {
+        setErro("Erro de conexão com o servidor");
+      }
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -56,9 +73,10 @@ export default function Login() {
           </div>
           <button
             type="submit"
+            disabled={loading}
             className="w-full py-3 px-4 bg-purple-600 text-white font-semibold rounded-xl shadow-md hover:bg-purple-700 hover:shadow-lg transition duration-300"
           >
-            Entrar
+            {loading ? "Entrando..." : "Entrar"}
           </button>
         </form>
       </div>
