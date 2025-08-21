@@ -1,5 +1,5 @@
-import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Login from "../pages/loginPage/Login";
+import { Routes, Route, Navigate } from "react-router-dom";
+import Login from "../pages/LoginPage/Login";
 import { useAuth } from "../context/AuthContext";
 
 const PrivateRoute = ({ children }) => {
@@ -9,7 +9,6 @@ const PrivateRoute = ({ children }) => {
 
 export default function AppRoutes() {
   return (
-    <BrowserRouter>
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route
@@ -38,6 +37,6 @@ export default function AppRoutes() {
         />
         <Route path="*" element={<Navigate to="/login" />} />
       </Routes>
-    </BrowserRouter>
+
   );
 }
