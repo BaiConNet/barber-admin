@@ -1,35 +1,43 @@
-import { createContext, useContext, useState } from "react";
-import axios from "axios";
+// src/context/AuthContext.jsx
+import { createContext, useContext, useState, useEffect } from "react";
 
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [user, setUser] = useState(null);
+  const [auth, setAuth] = useState(() => {
+    // Carrega do localStorage ao iniciar
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
+    return token && user ? { token, user: JSON.parse(user) } : { token: null, user: null };
+  });
 
-  const login = async (email, senha) => {
-    try {
-      const response = await axios.post("http://localhost:3000/user/login", { email, senha });
-      const token = response.data.token;
-      localStorage.setItem("token", token);
-      // Aqui você pode salvar o user completo se quiser
-      setUser({ email }); 
-      return true;
-    } catch (err) {
-      console.error(err);
-      return false;
+  // Salva no localStorage sempre que auth mudar
+  useEffect(() => {
+    if (auth.token && auth.user) {
+      localStorage.setItem("token", auth.token);
+      localStorage.setItem("user", JSON.stringify(auth.user));
+    } else {
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
     }
+  }, [auth]);
+
+  const login = (data) => {
+    // data = { token, user } vindo do backend
+    setAuth(data);
   };
 
   const logout = () => {
-    localStorage.removeItem("token");
-    setUser(null);
+    setAuth({ token: null, user: null });
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, logout }}>
+    <AuthContext.Provider value={{ auth, login, logout }}>
       {children}
     </AuthContext.Provider>
   );
 }
 
-export const useAuth = () => useContext(AuthContext);
+export function useAuth() {
+  return useContext(AuthContext);
+}
