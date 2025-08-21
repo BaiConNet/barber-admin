@@ -1,16 +1,27 @@
 import { Routes, Route, Navigate } from "react-router-dom";
+import Home from  "../pages/HomePage/Home";
 import Login from "../pages/LoginPage/Login";
+import Dashboard from "../pages/AdminDashboardPage/Dashboard";
+import Servicos from "../pages/AdminDashboardPage/Servicos";
+import Horarios from "../pages/AdminDashboardPage/Horarios";
 import { useAuth } from "../context/AuthContext";
 
+// Auth Ficticio
 const PrivateRoute = ({ children }) => {
+  const { auth } = useAuth();
+  return auth && auth.user ? children : <Navigate to="/login" />;
+};
+
+/*const PrivateRoute = ({ children }) => {
   const { user } = useAuth();
   return user ? children : <Navigate to="/login" />;
-};
+};*/
 
 export default function AppRoutes() {
   return (
       <Routes>
         <Route path="/login" element={<Login />} />
+        <Route path="/home" element={<Home />} />
         <Route
           path="/dashboard"
           element={

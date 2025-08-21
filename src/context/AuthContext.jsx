@@ -4,12 +4,20 @@ import { createContext, useContext, useState, useEffect } from "react";
 const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
-  const [auth, setAuth] = useState(() => {
+
+// Auth Mockado para conferir Page /dashboard
+  const [auth, setAuth] = useState({
+  token: "fake-token",
+  user: { nome: "Usuário Teste" }
+});
+
+
+/*  const [auth, setAuth] = useState(() => {
     // Carrega do localStorage ao iniciar
     const token = localStorage.getItem("token");
     const user = localStorage.getItem("user");
     return token && user ? { token, user: JSON.parse(user) } : { token: null, user: null };
-  });
+  });*/
 
   // Salva no localStorage sempre que auth mudar
   useEffect(() => {
