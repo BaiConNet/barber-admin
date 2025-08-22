@@ -19,14 +19,22 @@ export default function Login() {
 
     try {
       
-      const res = await axios.post("http://localhost:3000/user/login", { email, senha, })
+      const res = await axios.post("https://api-bairro.onrender.com/user/login", { email, senha, })
       const data = await res.data;
+
+      // Verifica a role do usuário
+      if (data.user.role !== "BARBEIRO" && data.user.role !== "ADMIN") {
+        setErro("Acesso permitido apenas para barbeiros ou administradores.");
+        setLoading(false);
+        return;
+      }
 
       // Aqui salvamos no contexto o token e o user retornados
       login({ token: data.token, user: data.user });
 
       navigate("/dashboard");
     } catch (error) {
+      console.log(error); // Adicione esta linha
       if (error.response) {
         setErro(error.response.data.message || "Email ou senha inválidos");
       } else {
