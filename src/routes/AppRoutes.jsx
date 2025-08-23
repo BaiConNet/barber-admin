@@ -5,6 +5,8 @@ import Dashboard from "../pages/AdminDashboardPage/Dashboard";
 import Servicos from "../pages/AdminDashboardPage/Servicos";
 import Horarios from "../pages/AdminDashboardPage/Horarios";
 import { useAuth } from "../context/AuthContext";
+import Register from "../pages/registerPage/Register";
+import ForgotPassword from "../pages/ForgotPasswordPage/ForgotPassword";
 
 // Auth Ficticio
 /*const PrivateRoute = ({ children }) => {
@@ -20,8 +22,31 @@ const PrivateRoute = ({ children }) => {
 export default function AppRoutes() {
   return (
       <Routes>
-        <Route path="/login" element={<Login />} />
-        <Route path="/home" element={<Home />} />
+        <Route
+          path="/login"
+          element={
+            <Login />
+          }
+        />
+        <Route
+          path="/home"
+          element={
+            <Home />
+          }
+        />
+        <Route
+          path="/register"
+          element={
+              <Register />
+          }
+        />
+        <Route
+          path="/forgot-password"
+          element={
+              <ForgotPassword />
+          }
+        />
+        {/* Rotas privadas */}
         <Route
           path="/dashboard"
           element={

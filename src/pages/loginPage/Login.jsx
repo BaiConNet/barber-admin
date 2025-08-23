@@ -1,5 +1,6 @@
 import { useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 
@@ -87,6 +88,22 @@ export default function Login() {
             {loading ? "Entrando..." : "Entrar"}
           </button>
         </form>
+
+        {/* Links extras */}
+        <div className="mt-6 flex justify-between text-sm">
+          <Link
+            to="/forgot-password"
+            className="text-purple-600 hover:underline"
+          >
+            Esqueci minha senha
+          </Link>
+          <Link
+            to="/register"
+            className="text-purple-600 hover:underline"
+          >
+            Criar conta
+          </Link>
+        </div>
       </div>
     </div>
   );
