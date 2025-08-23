@@ -8,7 +8,8 @@ export default function Register() {
     nome: "",
     email: "",
     telefone: "",
-    senha: ""
+    senha: "",
+    role: "BARBEIRO"
   });
   const [erro, setErro] = useState("");
   const [loading, setLoading] = useState(false);

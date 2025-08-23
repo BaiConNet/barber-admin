@@ -7,6 +7,7 @@ import Horarios from "../pages/AdminDashboardPage/Horarios";
 import { useAuth } from "../context/AuthContext";
 import Register from "../pages/registerPage/Register";
 import ForgotPassword from "../pages/ForgotPasswordPage/ForgotPassword";
+import ResetPassword from "../pages/ResetPasswordPage/ResetPassword";
 
 const PrivateRoute = ({ children }) => {
   const { auth } = useAuth();
@@ -38,6 +39,12 @@ export default function AppRoutes() {
           path="/forgot-password"
           element={
               <ForgotPassword />
+          }
+        />
+        <Route
+          path="/reset-password/:token"
+          element={
+              <ResetPassword />
           }
         />
         {/* Rotas privadas */}

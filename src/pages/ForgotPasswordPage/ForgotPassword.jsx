@@ -13,7 +13,7 @@ export default function ForgotPassword() {
     setLoading(true);
 
     try {
-      await axios.post("https://api-bairro.onrender.com/user/forgot-password", { email });
+      await axios.post("https://api-bairro.onrender.com/forgot-password", { email });
       setMensagem("Se o email estiver cadastrado, você receberá instruções.");
     } catch (error) {
       setMensagem("Erro ao solicitar recuperação de senha");
