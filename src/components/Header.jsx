@@ -2,7 +2,7 @@ import React from 'react';
 
 export default function Header() {
     return (
-        <header className="w-full bg-green-600 h-16 flex items-center justify-between px-6 shadow">
+        <header className="w-full bg-green-900 h-16 flex items-center justify-between px-6 shadow">
             <div className="flex items-center gap-2">
                 <span className="text-white font-bold text-xl">Barber Admin</span>
             </div>
