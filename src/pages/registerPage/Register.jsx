@@ -11,16 +11,79 @@ export default function Register() {
     senha: "",
     role: "BARBEIRO"
   });
+  
   const [erro, setErro] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [senhaValida, setSenhaValida] = useState({
+    maiuscula: false,
+    minuscula: false,
+    numero: false,
+    comprimento: false
+  });
+
   const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+    const { name, value } = e.target;
+    
+    let valor = value;
+
+    if(name === "telefone") {
+      valor = valor.replace(/\D/g, "").slice(0, 11);
+    }
+
+    setForm({ ...form, [name]: valor });
+
+  if (name === "senha") {
+      const regexMaiuscula = /[A-Z]/.test(value);
+      const regexMinuscula = /[a-z]/.test(value);
+      const regexNumero = /\d/.test(value);
+      const regexComprimento = value.length >= 8;
+
+      setSenhaValida({
+        maiuscula: regexMaiuscula,
+        minuscula: regexMinuscula,
+        numero: regexNumero,
+        comprimento: regexComprimento
+      });
+
+      // Mensagem de erro
+      if (!regexMaiuscula || !regexMinuscula || !regexNumero || !regexComprimento) {
+        setErro("Senha não atende aos requisitos.");
+      } else {
+        setErro("");
+      }
+    }
+
+  if (name === "nome") {
+      const regexNome = /^[A-Za-zÀ-ÿ\s]+$/.test(valor);
+      if (!regexNome || valor.trim().length < 30 || valor.trim().length > 30) {
+        setErro("O nome deve conter nome e sobrenome.");
+      } else {
+        setErro("");
+      }
+    }
+
+  if (name === "email") {
+      const regexEmail = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor);
+      if (!regexEmail) {
+        setErro("Informe um email válido.");
+      } else {
+        setErro("");
+      }
+    }
+
+  if (name === "telefone") {
+      if (valor.length < 11) {
+        setErro("Telefone deve ter 11 dígitos.");
+      } else {
+        setErro("");
+      }
+    }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    setErro("");
+    if (erro) return;
     setLoading(true);
 
     try {
@@ -45,14 +108,16 @@ export default function Register() {
         </h1>
         <form className="space-y-4" onSubmit={handleSubmit}>
           {erro && <p className="text-red-500 text-center">{erro}</p>}
+
           <input
             type="text"
             name="nome"
             value={form.nome}
             onChange={handleChange}
-            placeholder="Nome"
+            placeholder="Nome completo"
             className="w-full px-4 py-3 border rounded-xl"
           />
+
           <input
             type="email"
             name="email"
@@ -61,14 +126,16 @@ export default function Register() {
             placeholder="Email"
             className="w-full px-4 py-3 border rounded-xl"
           />
+
           <input
             type="text"
             name="telefone"
             value={form.telefone}
             onChange={handleChange}
-            placeholder="Telefone"
+            placeholder="Telefone (somente números)"
             className="w-full px-4 py-3 border rounded-xl"
           />
+
           <input
             type="password"
             name="senha"
@@ -77,14 +144,39 @@ export default function Register() {
             placeholder="Senha"
             className="w-full px-4 py-3 border rounded-xl"
           />
+
+          {/* Checklist de senha */}
+          <div className="text-sm mt-2 space-y-1">
+            <p className={senhaValida.comprimento ? "text-green-600" : "text-red-500"}>
+              • Mínimo 8 caracteres
+            </p>
+            <p className={senhaValida.maiuscula ? "text-green-600" : "text-red-500"}>
+              • Contém letra maiúscula
+            </p>
+            <p className={senhaValida.minuscula ? "text-green-600" : "text-red-500"}>
+              • Contém letra minúscula
+            </p>
+            <p className={senhaValida.numero ? "text-green-600" : "text-red-500"}>
+              • Contém número
+            </p>
+          </div>
+
           <button
             type="submit"
-            disabled={loading}
+            disabled={
+              loading ||
+              erro ||
+              !form.senha ||
+              !form.nome ||
+              !form.email ||
+              !form.telefone
+            }
             className="w-full py-3 bg-purple-600 text-white rounded-xl"
           >
             {loading ? "Criando..." : "Registrar"}
           </button>
         </form>
+
         <p className="text-sm text-center mt-4">
           Já tem conta?{" "}
           <Link to="/login" className="text-purple-600 hover:underline">

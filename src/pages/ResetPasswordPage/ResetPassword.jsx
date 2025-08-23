@@ -3,14 +3,43 @@ import { useParams, Link, useNavigate } from "react-router-dom";
 import axios from "axios";
 
 export default function ResetPassword() {
-  const { token } = useParams(); // pega o token da URL
+  const { token } = useParams();
   const navigate = useNavigate();
   const [senha, setSenha] = useState("");
+  const [erro, setErro] = useState("");
   const [mensagem, setMensagem] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const [senhaValida, setSenhaValida] = useState({
+    maiuscula: false,
+    minuscula: false,
+    numero: false,
+    comprimento: false
+  });
+
+  const handleChange = (e) => {
+    const value = e.target.value;
+    setSenha(value);
+
+    const regexMaiuscula = /[A-Z]/.test(value);
+    const regexMinuscula = /[a-z]/.test(value);
+    const regexNumero = /\d/.test(value);
+    const regexComprimento = value.length >= 8;
+
+    setSenhaValida({
+      maiuscula: regexMaiuscula,
+      minuscula: regexMinuscula,
+      numero: regexNumero,
+      comprimento: regexComprimento
+    });
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
+    if (!senhaValida.maiuscula || !senhaValida.minuscula || !senhaValida.numero || !senhaValida.comprimento) {
+      setMensagem("A senha não atende aos requisitos.");
+      return;
+    }
     setMensagem("");
     setLoading(true);
 
@@ -38,10 +67,27 @@ export default function ResetPassword() {
           <input
             type="password"
             value={senha}
-            onChange={(e) => setSenha(e.target.value)}
+            onChange={handleChange}
             placeholder="Digite a nova senha"
             className="w-full px-4 py-3 border rounded-xl"
           />
+
+          {/* Checklist de senha */}
+          <div className="text-sm mt-2 space-y-1">
+            <p className={senhaValida.comprimento ? "text-green-600" : "text-red-500"}>
+              • Mínimo 8 caracteres
+            </p>
+            <p className={senhaValida.maiuscula ? "text-green-600" : "text-red-500"}>
+              • Contém letra maiúscula
+            </p>
+            <p className={senhaValida.minuscula ? "text-green-600" : "text-red-500"}>
+              • Contém letra minúscula
+            </p>
+            <p className={senhaValida.numero ? "text-green-600" : "text-red-500"}>
+              • Contém número
+            </p>
+          </div>
+
           <button
             type="submit"
             disabled={loading}
@@ -50,9 +96,11 @@ export default function ResetPassword() {
             {loading ? "Enviando..." : "Redefinir"}
           </button>
         </form>
+
         {mensagem && (
           <p className="text-center mt-4 text-sm text-gray-700">{mensagem}</p>
         )}
+
         <p className="text-sm text-center mt-4">
           <Link to="/login" className="text-green-600 hover:underline">
             Voltar ao Login
