@@ -5,19 +5,25 @@ import DashboardContent from '../../components/DashboardContent'
 
 export default function Dashboard() {
     return (
-      <div className="grid grid-cols-12 grid-rows-6 gap-0 h-screen">
+      <div className="h-screen grid grid-rows-[auto_1fr]">
         {/* Header - ocupa toda a largura, 1 linha */}
-        <header className="col-span-12 row-span-1">
+        <header className="bg-slate-700 col-span-full">
           <Header />
         </header>
       
-        {/* Sidebar - 2 colunas, 5 linhas restantes */}
-        <aside className="col-span-2 row-span-5 bg-gray-800">
+         {/* Área principal - ocupa resto da altura */}
+        <div className="grid grid-cols-[250px_1fr]">
+        {/* Sidebar - largura fixa*/}
+        <aside>
           <Sidebar />
         </aside>
-      
-          {/* Main Content - 10 colunas, 5 linhas restantes */}
-        <DashboardContent className="col-span-10 row-span-5 bg-gray-100" />
+        
+        {/* Conteúdo - ocupa resto da largura */}
+        <main className="bg-gray-100">
+          <DashboardContent />
+        </main>
+
+        </div>
     </div>
   );
     

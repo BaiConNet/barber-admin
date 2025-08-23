@@ -8,7 +8,7 @@ export default function DashboardContent() {
       
       {/* Cards de estatísticas */}
       <div className="grid grid-cols-0 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-red-500 p-6 rounded-lg shadow">
+        <div className="bg-white p-6 rounded-lg shadow">
           <h3 className="text-lg font-semibold">Agendamentos Hoje</h3>
           <p className="text-2xl font-bold text-blue-600">12</p>
         </div>
