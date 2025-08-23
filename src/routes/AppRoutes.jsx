@@ -7,15 +7,15 @@ import Horarios from "../pages/AdminDashboardPage/Horarios";
 import { useAuth } from "../context/AuthContext";
 
 // Auth Ficticio
-const PrivateRoute = ({ children }) => {
+/*const PrivateRoute = ({ children }) => {
   const { auth } = useAuth();
   return auth && auth.user ? children : <Navigate to="/login" />;
-};
+};*/
 
-/*const PrivateRoute = ({ children }) => {
+const PrivateRoute = ({ children }) => {
   const { user } = useAuth();
   return user ? children : <Navigate to="/login" />;
-};*/
+};
 
 export default function AppRoutes() {
   return (
