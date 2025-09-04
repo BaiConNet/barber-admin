@@ -14,7 +14,7 @@ const pageNames = {
 export default function Header({ sidebarOpen, setSidebarOpen, currentPage }) {
   return (
     <motion.header
-      className="bg-gray-800 border-b border-gray-700 px-6 py-4"
+      className="bg-gray-800 border-b border-gray-700 px-6 py-2"
       initial={{ y: -20, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.3 }}
@@ -22,12 +22,6 @@ export default function Header({ sidebarOpen, setSidebarOpen, currentPage }) {
       <div className="flex items-center justify-between">
         {/* Left side */}
         <div className="flex items-center space-x-4">
-          <button
-            onClick={() => setSidebarOpen(!sidebarOpen)}
-            className="lg:hidden p-2 rounded-lg hover:bg-gray-700 transition-colors"
-          >
-            <Menu className="w-5 h-5" />
-          </button>
           <div>
             <h2 className="text-2xl font-bold text-white">
               {pageNames[currentPage] || "Dashboard"}
