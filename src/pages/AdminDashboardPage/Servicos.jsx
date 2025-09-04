@@ -8,25 +8,22 @@ const Services = () => {
   const { auth } = useAuth();
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [erro, setErro] = useState("");
+  const [erro, setErro] = useState('');
   const [modal, setModal] = useState({ aberto: false, tipo: 'criar', servico: null });
   const [form, setForm] = useState({ nome: '', duracao: '', preco: '', category: '' });
-
-  const categories = ['Todos', 'Corte', 'Barba', 'Combo', 'Premium', 'Estética', 'Tratamento'];
   const [selectedCategory, setSelectedCategory] = useState('Todos');
 
+  const categories = ['Todos', 'Corte', 'Barba', 'Combo', 'Premium', 'Estética', 'Tratamento'];
+
   const config = {
-    headers: {
-      Authorization: `Bearer ${auth.token}`,
-    },
+    headers: { Authorization: `Bearer ${auth?.token}` },
   };
 
-  // Listar serviços do backend
   const listarServicos = async () => {
     try {
       setLoading(true);
       const res = await axios.get('https://api-bairro.onrender.com/servico', config);
-      setServices(res.data);
+      setServices(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error(err);
       setErro('Erro ao carregar serviços');
@@ -39,14 +36,17 @@ const Services = () => {
     listarServicos();
   }, []);
 
-  // Criar ou editar serviço
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
       if (modal.tipo === 'criar') {
         await axios.post('https://api-bairro.onrender.com/servico', form, config);
       } else if (modal.tipo === 'editar' && modal.servico) {
-        await axios.put(`https://api-bairro.onrender.com/servico/${modal.servico._id}`, form, config);
+        await axios.put(
+          `https://api-bairro.onrender.com/servico/${modal.servico._id}`,
+          form,
+          config
+        );
       }
       setModal({ aberto: false, tipo: 'criar', servico: null });
       setForm({ nome: '', duracao: '', preco: '', category: '' });
@@ -57,7 +57,6 @@ const Services = () => {
     }
   };
 
-  // Excluir serviço
   const excluirServico = async (id) => {
     if (!window.confirm('Deseja realmente excluir este serviço?')) return;
     try {
@@ -69,13 +68,17 @@ const Services = () => {
     }
   };
 
-  const filteredServices = services.filter(s =>
-    selectedCategory === 'Todos' || s.category === selectedCategory
+  const filteredServices = services.filter(
+    (s) => selectedCategory === 'Todos' || s.category === selectedCategory
   );
 
-  const totalRevenue = services.reduce((acc, s) => acc + s.preco, 0);
-  const averagePrice = services.reduce((acc, s) => acc + s.preco, 0) / (services.length || 1);
-  const averageDuration = services.reduce((acc, s) => acc + s.duracao, 0) / (services.length || 1);
+  const totalRevenue = services.reduce((acc, s) => acc + (s.preco || 0), 0);
+  const averagePrice = services.length
+    ? services.reduce((acc, s) => acc + (s.preco || 0), 0) / services.length
+    : 0;
+  const averageDuration = services.length
+    ? services.reduce((acc, s) => acc + (s.duracao || 0), 0) / services.length
+    : 0;
 
   return (
     <div className="space-y-6 p-6">
@@ -152,12 +155,14 @@ const Services = () => {
       <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
         <h3 className="text-lg font-semibold text-white mb-4">Filtrar por Categoria</h3>
         <div className="flex flex-wrap gap-2">
-          {categories.map(category => (
+          {categories.map((category) => (
             <button
               key={category}
               onClick={() => setSelectedCategory(category)}
               className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                selectedCategory === category ? 'bg-amber-500 text-white' : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
+                selectedCategory === category
+                  ? 'bg-amber-500 text-white'
+                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
               }`}
             >
               {category}
@@ -168,66 +173,71 @@ const Services = () => {
 
       {/* Services Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {filteredServices.map((service) => (
-          <motion.div key={service._id} className="bg-gray-800 rounded-xl border border-gray-700 p-6 hover:border-gray-600 transition-colors">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center space-x-3">
-                <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg flex items-center justify-center">
-                  <Scissors className="w-6 h-6 text-white" />
+        {loading ? (
+          <p className="text-gray-400 col-span-full text-center">Carregando serviços...</p>
+        ) : filteredServices.length > 0 ? (
+          filteredServices.map((service) => (
+            <motion.div
+              key={service._id}
+              className="bg-gray-800 rounded-xl border border-gray-700 p-6 hover:border-gray-600 transition-colors"
+            >
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center space-x-3">
+                  <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg flex items-center justify-center">
+                    <Scissors className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-semibold text-white">{service.nome}</h3>
+                    <span className="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded-full">
+                      {service.category || 'Sem Categoria'}
+                    </span>
+                  </div>
                 </div>
-                <div>
-                  <h3 className="text-lg font-semibold text-white">{service.nome}</h3>
-                  <span className="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded-full">
-                    {service.category || 'Sem Categoria'}
-                  </span>
+                <div className="flex space-x-2">
+                  <button
+                    className="p-2 text-gray-400 hover:text-blue-400 transition-colors"
+                    onClick={() => {
+                      setModal({ aberto: true, tipo: 'editar', servico: service });
+                      setForm({
+                        nome: service.nome,
+                        duracao: service.duracao,
+                        preco: service.preco,
+                        category: service.category || ''
+                      });
+                    }}
+                  >
+                    <Edit className="w-4 h-4" />
+                  </button>
+                  <button
+                    className="p-2 text-gray-400 hover:text-red-400 transition-colors"
+                    onClick={() => excluirServico(service._id)}
+                  >
+                    <Trash2 className="w-4 h-4" />
+                  </button>
                 </div>
               </div>
-              
-              <div className="flex space-x-2">
-                <button
-                  className="p-2 text-gray-400 hover:text-blue-400 transition-colors"
-                  onClick={() => {
-                    setModal({ aberto: true, tipo: 'editar', servico: service });
-                    setForm({
-                      nome: service.nome,
-                      duracao: service.duracao,
-                      preco: service.preco,
-                      category: service.category || ''
-                    });
-                  }}
-                >
-                  <Edit className="w-4 h-4" />
-                </button>
-                <button
-                  className="p-2 text-gray-400 hover:text-red-400 transition-colors"
-                  onClick={() => excluirServico(service._id)}
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
-              </div>
-            </div>
-            
-            <p className="text-gray-400 text-sm mb-4">{service.description || '-'}</p>
-            
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <DollarSign className="w-4 h-4 text-green-400" />
-                  <span className="text-gray-300">Preço</span>
+              <p className="text-gray-400 text-sm mb-4">{service.description || '-'}</p>
+              <div className="space-y-3">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <DollarSign className="w-4 h-4 text-green-400" />
+                    <span className="text-gray-300">Preço</span>
+                  </div>
+                  <span className="text-green-400 font-bold">R$ {service.preco}</span>
                 </div>
-                <span className="text-green-400 font-bold">R$ {service.preco}</span>
-              </div>
-              
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-2">
-                  <Clock className="w-4 h-4 text-blue-400" />
-                  <span className="text-gray-300">Duração</span>
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center space-x-2">
+                    <Clock className="w-4 h-4 text-blue-400" />
+                    <span className="text-gray-300">Duração</span>
+                  </div>
+                  <span className="text-blue-400 font-medium">{service.duracao}min</span>
                 </div>
-                <span className="text-blue-400 font-medium">{service.duracao}min</span>
               </div>
-            </div>
-          </motion.div>
-        ))}
+            </motion.div>
+          ))
+        ) : (
+          <p className="text-gray-400 col-span-full text-center">Nenhum serviço cadastrado.</p>
+        )}
       </div>
 
       {/* Modal criar/editar */}

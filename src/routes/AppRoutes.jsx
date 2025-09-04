@@ -7,6 +7,7 @@ import Horarios from "../pages/AdminDashboardPage/Horarios";
 import Register from "../pages/registerPage/Register";
 import ForgotPassword from "../pages/ForgotPasswordPage/ForgotPassword";
 import ResetPassword from "../pages/ResetPasswordPage/ResetPassword";
+import PrivateLayout from "../components/PrivateLayout";
 import PrivateRoute from "../components/PrivateRoute";
 
 export default function AppRoutes() {
@@ -23,7 +24,9 @@ export default function AppRoutes() {
         path="/dashboard"
         element={
           <PrivateRoute>
-            <Dashboard />
+            <PrivateLayout>
+              <Dashboard />
+            </PrivateLayout>
           </PrivateRoute>
         }
       />
@@ -31,7 +34,9 @@ export default function AppRoutes() {
         path="/servicos"
         element={
           <PrivateRoute>
-            <Servicos />
+            <PrivateLayout>
+              <Servicos />
+            </PrivateLayout>
           </PrivateRoute>
         }
       />
@@ -39,7 +44,9 @@ export default function AppRoutes() {
         path="/horarios"
         element={
           <PrivateRoute>
-            <Horarios />
+            <PrivateLayout>
+              <Horarios />
+            </PrivateLayout>
           </PrivateRoute>
         }
       />
