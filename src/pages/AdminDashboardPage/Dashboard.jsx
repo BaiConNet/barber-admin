@@ -1,5 +1,6 @@
 
 
+
 import React, { useState } from 'react';
 import Header from '../../components/Header';
 import Sidebar from '../../components/Sidebar';
@@ -8,45 +9,68 @@ import RevenueChart from '../../components/RevenueChart';
 import AppointmentsList from '../../components/AppointmentsList';
 import { Users, Calendar, DollarSign, TrendingUp, Clock, Star, Scissors } from 'lucide-react';
 import { motion } from 'framer-motion';
+import usePainelDashboard from '../../hooks/usePainelDashboard';
+import { useAuth } from '../../context/AuthContext';
+
 
 
 export default function Dashboard() {
   const [isOpen, setIsOpen] = useState(true);
+  const { auth } = useAuth();
+  const token = auth?.token;
+  const { data, loading, error } = usePainelDashboard(token);
 
-  const stats = [
+  // Exemplo de mapeamento dos dados reais para os cards (ajuste conforme o retorno da API)
+  const stats = data ? [
     {
       title: 'Faturamento Hoje',
-      value: 'R$ 1.250,00',
-      change: '+12%',
-      trend: 'up',
+      value: data.faturamentoHoje ? `R$ ${data.faturamentoHoje}` : '-',
+      change: data.faturamentoChange || '+0%',
+      trend: data.faturamentoTrend || 'up',
       icon: DollarSign,
       color: 'green'
     },
     {
       title: 'Agendamentos Hoje',
-      value: '18',
-      change: '+5%',
-      trend: 'up',
+      value: data.agendamentosHoje || '-',
+      change: data.agendamentosChange || '+0%',
+      trend: data.agendamentosTrend || 'up',
       icon: Calendar,
       color: 'blue'
     },
     {
       title: 'Clientes Ativos',
-      value: '342',
-      change: '+8%',
-      trend: 'up',
+      value: data.clientesAtivos || '-',
+      change: data.clientesChange || '+0%',
+      trend: data.clientesTrend || 'up',
       icon: Users,
       color: 'purple'
     },
     {
       title: 'Avaliação Média',
-      value: '4.8',
-      change: '+0.2',
-      trend: 'up',
+      value: data.avaliacaoMedia || '-',
+      change: data.avaliacaoChange || '+0',
+      trend: data.avaliacaoTrend || 'up',
       icon: Star,
       color: 'yellow'
     }
-  ];
+  ] : [];
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <span className="text-gray-400 text-lg">Carregando painel...</span>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <span className="text-red-400 text-lg">Erro ao carregar painel</span>
+      </div>
+    );
+  }
 
   return (
     <div className="h-screen">
@@ -77,7 +101,7 @@ export default function Dashboard() {
               animate={{ opacity: 1, x: 0 }}
               transition={{ duration: 0.4, delay: 0.2 }}
             >
-              <RevenueChart />
+              <RevenueChart data={data?.graficoReceita} />
             </motion.div>
 
             {/* Quick Stats */}
@@ -98,7 +122,7 @@ export default function Dashboard() {
                       </div>
                       <span className="text-gray-300">Tempo Médio</span>
                     </div>
-                    <span className="text-white font-medium">45min</span>
+                    <span className="text-white font-medium">{data?.tempoMedio || '-'}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
@@ -107,7 +131,7 @@ export default function Dashboard() {
                       </div>
                       <span className="text-gray-300">Taxa Ocupação</span>
                     </div>
-                    <span className="text-white font-medium">87%</span>
+                    <span className="text-white font-medium">{data?.taxaOcupacao || '-'}</span>
                   </div>
                   <div className="flex items-center justify-between">
                     <div className="flex items-center space-x-3">
@@ -116,7 +140,7 @@ export default function Dashboard() {
                       </div>
                       <span className="text-gray-300">Serviços Realizados</span>
                     </div>
-                    <span className="text-white font-medium">23</span>
+                    <span className="text-white font-medium">{data?.servicosRealizados || '-'}</span>
                   </div>
                 </div>
               </div>
@@ -125,22 +149,12 @@ export default function Dashboard() {
               <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
                 <h3 className="text-lg font-semibold text-white mb-4">Serviços Populares</h3>
                 <div className="space-y-3">
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Corte + Barba</span>
-                    <span className="text-amber-400 font-medium">R$ 45</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Corte Simples</span>
-                    <span className="text-amber-400 font-medium">R$ 25</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Barba</span>
-                    <span className="text-amber-400 font-medium">R$ 20</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-gray-300">Sobrancelha</span>
-                    <span className="text-amber-400 font-medium">R$ 15</span>
-                  </div>
+                  {data?.servicosPopulares?.map((servico, idx) => (
+                    <div key={servico.nome + idx} className="flex justify-between items-center">
+                      <span className="text-gray-300">{servico.nome}</span>
+                      <span className="text-amber-400 font-medium">R$ {servico.valor}</span>
+                    </div>
+                  ))}
                 </div>
               </div>
             </motion.div>
@@ -152,7 +166,7 @@ export default function Dashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.4 }}
           >
-            <AppointmentsList />
+            <AppointmentsList data={data?.agendamentosRecentes} />
           </motion.div>
         </main>
       </div>
