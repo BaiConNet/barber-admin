@@ -24,7 +24,7 @@ export default function AppRoutes() {
         path="/dashboard"
         element={
           <PrivateRoute>
-            <PrivateLayout>
+            <PrivateLayout currentPage="dashboard">
               <Dashboard />
             </PrivateLayout>
           </PrivateRoute>
@@ -34,7 +34,7 @@ export default function AppRoutes() {
         path="/servicos"
         element={
           <PrivateRoute>
-            <PrivateLayout>
+            <PrivateLayout currentPage="services">
               <Servicos />
             </PrivateLayout>
           </PrivateRoute>
@@ -44,7 +44,7 @@ export default function AppRoutes() {
         path="/horarios"
         element={
           <PrivateRoute>
-            <PrivateLayout>
+            <PrivateLayout  currentPage="appointments">
               <Horarios />
             </PrivateLayout>
           </PrivateRoute>
