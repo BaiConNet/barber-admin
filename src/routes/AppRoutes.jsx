@@ -1,79 +1,50 @@
 import { Routes, Route, Navigate } from "react-router-dom";
-import Home from  "../pages/HomePage/Home";
+import Home from "../pages/HomePage/Home";
 import Login from "../pages/LoginPage/Login";
 import Dashboard from "../pages/AdminDashboardPage/Dashboard";
 import Servicos from "../pages/AdminDashboardPage/Servicos";
 import Horarios from "../pages/AdminDashboardPage/Horarios";
-import { useAuth } from "../context/AuthContext";
 import Register from "../pages/registerPage/Register";
 import ForgotPassword from "../pages/ForgotPasswordPage/ForgotPassword";
 import ResetPassword from "../pages/ResetPasswordPage/ResetPassword";
-
-const PrivateRoute = ({ children }) => {
-  const { auth } = useAuth();
-  return auth.user ? children : <Navigate to="/login" />;
-};
+import PrivateRoute from "../components/PrivateRoute";
 
 export default function AppRoutes() {
   return (
-      <Routes>
-        <Route
-          path="/login"
-          element={
-            <Login />
-          }
-        />
-        <Route
-          path="/home"
-          element={
-            <Home />
-          }
-        />
-        <Route
-          path="/register"
-          element={
-              <Register />
-          }
-        />
-        <Route
-          path="/forgot-password"
-          element={
-              <ForgotPassword />
-          }
-        />
-        <Route
-          path="/reset-password/:token"
-          element={
-              <ResetPassword />
-          }
-        />
-        {/* Rotas privadas */}
-        <Route
-          path="/dashboard"
-          element={
-            <PrivateRoute>
-              <Dashboard />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/servicos"
-          element={
-            <PrivateRoute>
-              <Servicos />
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/horarios"
-          element={
-            <PrivateRoute>
-              <Horarios />
-            </PrivateRoute>
-          }
-        />
-        <Route path="*" element={<Navigate to="/login" />} />
-      </Routes>
+    <Routes>
+      <Route path="/login" element={<Login />} />
+      <Route path="/home" element={<Home />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/forgot-password" element={<ForgotPassword />} />
+      <Route path="/reset-password/:token" element={<ResetPassword />} />
 
+      {/* Rotas privadas */}
+      <Route
+        path="/dashboard"
+        element={
+          <PrivateRoute>
+            <Dashboard />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/servicos"
+        element={
+          <PrivateRoute>
+            <Servicos />
+          </PrivateRoute>
+        }
+      />
+      <Route
+        path="/horarios"
+        element={
+          <PrivateRoute>
+            <Horarios />
+          </PrivateRoute>
+        }
+      />
+
+      <Route path="*" element={<Navigate to="/login" />} />
+    </Routes>
   );
 }
