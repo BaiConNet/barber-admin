@@ -14,37 +14,39 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
-    setErro("");
-    setLoading(true);
+  e.preventDefault();
+  setErro("");
+  setLoading(true);
 
-    try {
-      
-      const res = await axios.post("https://api-bairro.onrender.com/user/login", { email, senha, })
-      const data = await res.data;
+  try {
+    const { data } = await axios.post(
+      "https://api-bairro.onrender.com/user/login",
+      { email, senha }
+    );
 
-      // Verifica a role do usuário
-      if (data.user.role !== "BARBEIRO" && data.user.role !== "ADMIN") {
-        setErro("Acesso permitido apenas para barbeiros ou administradores.");
-        setLoading(false);
-        return;
-      }
-
-      // Aqui salvamos no contexto o token e o user retornados
-      login({ token: data.token, user: data.user });
-
-      navigate("/dashboard");
-    } catch (error) {
-      console.log(error); // Adicione esta linha
-      if (error.response) {
-        setErro(error.response.data.message || "Email ou senha inválidos");
-      } else {
-        setErro("Erro de conexão com o servidor");
-      }
-    } finally {
-      setLoading(false);
+    if (data.user.role !== "BARBEIRO" && data.user.role !== "ADMIN") {
+      setErro("Acesso permitido apenas para barbeiros ou administradores.");
+      return;
     }
-  };
+
+    login({ token: data.token, user: data.user });
+
+    // Limpa a senha do estado
+    setSenha("");
+
+    navigate("/dashboard");
+  } catch (error) {
+    console.log(error);
+    if (error.response) {
+      setErro(error.response.data.message || "Email ou senha inválidos");
+    } else {
+      setErro("Erro de conexão com o servidor");
+    }
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-400 via-purple-400 to-pink-400">

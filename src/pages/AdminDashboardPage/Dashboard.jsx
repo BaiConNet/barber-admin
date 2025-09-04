@@ -2,8 +2,6 @@
 
 
 import React, { useState } from 'react';
-import Header from '../../components/Header';
-import Sidebar from '../../components/Sidebar';
 import StatsCard from '../../components/StatsCard';
 import RevenueChart from '../../components/RevenueChart';
 import AppointmentsList from '../../components/AppointmentsList';
@@ -73,24 +71,20 @@ export default function Dashboard() {
   }
 
   return (
-    <div className="h-screen">
-      <Sidebar isOpen={isOpen} setIsOpen={setIsOpen} />
-      <div className={`transition-all duration-300 ${isOpen ? 'pl-64' : 'pl-16'}`}>
-        <Header />
-        <main className="space-y-6 p-6">
-          {/* Stats Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {stats.map((stat, index) => (
-              <motion.div
-                key={stat.title}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.3, delay: index * 0.1 }}
-              >
-                <StatsCard {...stat} />
-              </motion.div>
-            ))}
-          </div>
+    <div className="space-y-6">
+      {/* Stats Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {stats.map((stat, index) => (
+          <motion.div
+            key={stat.title}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3, delay: index * 0.1 }}
+          >
+            <StatsCard {...stat} />
+          </motion.div>
+        ))}
+      </div>
 
           {/* Charts and Lists */}
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
