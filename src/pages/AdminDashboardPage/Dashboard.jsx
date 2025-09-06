@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import StatsCard from "../../components/StatsCard";
-import RevenueChart from "../../components/RevenueChart";
-import AppointmentsList from "../../components/AppointmentsList";
+import StatsCard from "../../components/StatsCard.jsx";
+import RevenueChart from "../../components/RevenueChart.jsx";
+import AppointmentsList from "../../components/AppointmentsList.jsx";
 import {
   Users,
   Calendar,
