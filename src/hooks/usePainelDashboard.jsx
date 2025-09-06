@@ -11,7 +11,7 @@ export default function usePainelDashboard(token) {
     if (!token) return
     setLoading(true)
     axios.get('/admin/painel', {
-      baseURL: import.meta.env.VITE_API_URL || 'https://api-bairro.onrender.com',
+      baseURL: import.meta.env.VITE_API_URL || 'https://back-end-integration.onrender.com',
       headers: { Authorization: `Bearer ${token}` }
     })
       .then(res => setData(res.data))

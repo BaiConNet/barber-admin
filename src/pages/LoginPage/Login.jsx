@@ -20,7 +20,7 @@ export default function Login() {
 
   try {
     const { data } = await axios.post(
-      "https://api-bairro.onrender.com/user/login",
+      "https://back-end-integration.onrender.com/user/login",
       { email, senha }
     );
 

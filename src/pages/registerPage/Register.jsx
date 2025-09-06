@@ -87,7 +87,7 @@ export default function Register() {
     setLoading(true);
 
     try {
-      await axios.post("https://api-bairro.onrender.com/user/register", form);
+      await axios.post("https://back-end-integration.onrender.com/user/register", form);
       navigate("/login");
     } catch (error) {
       if (error.response) {

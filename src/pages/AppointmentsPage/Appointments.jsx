@@ -29,7 +29,7 @@ const Appointments = () => {
     try {
       setLoading(true);
       const res = await axios.get(
-        `https://api-bairro.onrender.com/agendamento?data=${selectedDate}`,
+        `https://back-end-integration.onrender.com/agendamento?data=${selectedDate}`,
         config
       );
       setAppointments(res.data);
