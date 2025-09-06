@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Scissors, Plus, Edit, Trash2, Clock, DollarSign, TrendingUp } from 'lucide-react';
 import axios from 'axios';
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from '../../context/AuthContext.jsx';
 
 const Services = () => {
   const { auth } = useAuth();
