@@ -29,7 +29,7 @@ const Appointments = () => {
     try {
       setLoading(true);
       const res = await axios.get(
-        `https://back-end-integration.onrender.com/agendamento?data=${selectedDate}`,
+        `${process.env.REACT_APP_API_URL}/agendamento?data=${selectedDate}`,
         config
       );
       setAppointments(res.data);

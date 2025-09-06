@@ -13,7 +13,7 @@ export default function ForgotPassword() {
     setLoading(true);
 
     try {
-      await axios.post("https://back-end-integration.onrender.com/forgot-password", { email });
+      await axios.post(`${process.env.REACT_APP_API_URL}/forgot-password`, { email });
       setMensagem("Se o email estiver cadastrado, você receberá instruções.");
     } catch (error) {
       setMensagem("Erro ao solicitar recuperação de senha");

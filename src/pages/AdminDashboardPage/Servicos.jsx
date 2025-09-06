@@ -22,7 +22,7 @@ const Services = () => {
   const listarServicos = async () => {
     try {
       setLoading(true);
-      const res = await axios.get('https://back-end-integration.onrender.com/servico', config);
+      const res = await axios.get(`${process.env.REACT_APP_API_URL}/servico`, config);
       setServices(Array.isArray(res.data) ? res.data : []);
     } catch (err) {
       console.error(err);
@@ -40,10 +40,10 @@ const Services = () => {
     e.preventDefault();
     try {
       if (modal.tipo === 'criar') {
-        await axios.post('https://back-end-integration.onrender.com/servico', form, config);
+        await axios.post(`${process.env.REACT_APP_API_URL}/servico`, form, config);
       } else if (modal.tipo === 'editar' && modal.servico) {
         await axios.put(
-          `https://back-end-integration.onrender.com/servico/${modal.servico._id}`,
+          `${process.env.REACT_APP_API_URL}/servico/${modal.servico._id}`,
           form,
           config
         );
@@ -60,7 +60,7 @@ const Services = () => {
   const excluirServico = async (id) => {
     if (!window.confirm('Deseja realmente excluir este serviço?')) return;
     try {
-      await axios.delete(`https://back-end-integration.onrender.com/servico/${id}`, config);
+      await axios.delete(`${process.env.REACT_APP_API_URL}/servico/${id}`, config);
       listarServicos();
     } catch (err) {
       console.error(err);

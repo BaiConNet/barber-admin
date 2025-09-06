@@ -44,7 +44,7 @@ export default function ResetPassword() {
     setLoading(true);
 
     try {
-      await axios.post(`https://back-end-integration.onrender.com/reset-password/${token}`, {
+      await axios.post(`${process.env.REACT_APP_API_URL}/reset-password/${token}`, {
         senha,
       });
 
