@@ -20,7 +20,7 @@ export default function Login() {
 
   try {
     const { data } = await axios.post(
-      "https://back-end-integration.onrender.com/user/login",
+      `${process.env.REACT_APP_API_URL}/user/login`,
       { email, senha }
     );
 
