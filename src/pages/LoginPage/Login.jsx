@@ -20,7 +20,7 @@ export default function Login() {
 
   try {
     const { data } = await axios.post(
-      `${process.env.REACT_APP_API_URL}/user/login`,
+      `${import.meta.env.VITE_API_URL}/user/login`,
       { email, senha }
     );
 

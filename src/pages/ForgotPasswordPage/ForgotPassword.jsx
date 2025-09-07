@@ -13,7 +13,7 @@ export default function ForgotPassword() {
     setLoading(true);
 
     try {
-      await axios.post(`${process.env.REACT_APP_API_URL}/forgot-password`, { email });
+      await axios.post(`${import.meta.env.VITE_API_URL}/forgot-password`, { email });
       setMensagem("Se o email estiver cadastrado, você receberá instruções.");
     } catch (error) {
       setMensagem("Erro ao solicitar recuperação de senha");
