@@ -29,7 +29,7 @@ const Appointments = () => {
     try {
       setLoading(true);
       const res = await axios.get(
-        `${process.env.REACT_APP_API_URL}/agendamento?data=${selectedDate}`,
+        `${import.meta.env.VITE_API_URL}/agendamento?data=${selectedDate}`,
         config
       );
       setAppointments(res.data);
