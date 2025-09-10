@@ -85,8 +85,7 @@ const Services = () => {
       {/* Header */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
         <div>
-          <h1 className="text-2xl font-bold text-white">Serviços</h1>
-          <p className="text-gray-400">Gerencie os serviços oferecidos pela barbearia</p>
+          <h1 className="text-gray-400">Gerencie seus serviços da barbearia</h1>
         </div>
         
         <motion.button

@@ -26,9 +26,11 @@ export default function Header({ sidebarOpen, setSidebarOpen, currentPage }) {
             <h2 className="text-2xl font-bold text-white">
               {pageNames[currentPage] || "Dashboard"}
             </h2>
-            <p className="text-gray-400 text-sm">
-              Bem-vindo ao seu painel de controle
-            </p>
+              {currentPage === "dashboard" && (
+                <p className="text-gray-400 text-sm">
+                  Bem-vindo ao seu painel de controle
+                </p>
+              )}
           </div>
         </div>
 
