@@ -11,7 +11,7 @@ const pageNames = {
   settings: "Configurações",
 };
 
-export default function Header({ sidebarOpen, setSidebarOpen, currentPage }) {
+export default function Header({ sidebarOpen, setSidebarOpen, currentPage, subTitle  }) {
   return (
     <motion.header
       className="bg-gray-800 border-b border-gray-700 px-6 py-2"
@@ -21,17 +21,16 @@ export default function Header({ sidebarOpen, setSidebarOpen, currentPage }) {
     >
       <div className="flex items-center justify-between">
         {/* Left side */}
-        <div className="flex items-center space-x-4">
-          <div>
+        <div className="flex flex-col">
             <h2 className="text-2xl font-bold text-white">
               {pageNames[currentPage] || "Dashboard"}
             </h2>
-              {currentPage === "dashboard" && (
-                <p className="text-gray-400 text-sm">
-                  Bem-vindo ao seu painel de controle
+              {/* Subtítulo dinâmico */}
+              {subTitle && (
+                <p className="text-gray-400 text-sm mt-1">
+                  {subTitle}
                 </p>
               )}
-          </div>
         </div>
 
         {/* Right side */}

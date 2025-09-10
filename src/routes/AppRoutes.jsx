@@ -25,7 +25,7 @@ export default function AppRoutes() {
         path="/dashboard"
         element={
           <PrivateRoute>
-            <PrivateLayout currentPage="dashboard">
+            <PrivateLayout currentPage="dashboard" subTitle="Bem-vindo ao seu painel de controle">
               <Dashboard />
             </PrivateLayout>
           </PrivateRoute>
@@ -35,7 +35,7 @@ export default function AppRoutes() {
         path="/Agendamentos"
         element={
           <PrivateRoute>
-            <PrivateLayout currentPage="appointments">
+            <PrivateLayout currentPage="appointments" subTitle="Gerencie todos os agendamentos da barbearia">
               <Appointments />
             </PrivateLayout>
           </PrivateRoute>
@@ -45,7 +45,7 @@ export default function AppRoutes() {
         path="/servicos"
         element={
           <PrivateRoute>
-            <PrivateLayout currentPage="services">
+            <PrivateLayout currentPage="services" subTitle="Gerencie seus serviços da barbearia">
               <Servicos />
             </PrivateLayout>
           </PrivateRoute>
