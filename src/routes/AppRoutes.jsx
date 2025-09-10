@@ -35,7 +35,7 @@ export default function AppRoutes() {
         path="/Agendamentos"
         element={
           <PrivateRoute>
-            <PrivateLayout>
+            <PrivateLayout currentPage="appointments">
               <Appointments />
             </PrivateLayout>
           </PrivateRoute>
