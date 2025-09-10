@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import Header from './Header.jsx';
 import Sidebar from './Sidebar.jsx';
 
-export default function PrivateLayout({ children, currentPage }) {
+export default function PrivateLayout({ children, currentPage, subTitle }) {
   const [isOpen, setIsOpen] = useState(false);
 
   return (
@@ -13,7 +13,7 @@ export default function PrivateLayout({ children, currentPage }) {
       {/* Main content */}
       <div className={`flex-1 flex flex-col transition-all duration-300 ${isOpen ? 'pl-64' : 'pl-16'} bg-barber-card`}>
         {/* Header */}
-        <Header sidebarOpen={isOpen} setSidebarOpen={setIsOpen} currentPage={currentPage} />
+        <Header sidebarOpen={isOpen} setSidebarOpen={setIsOpen} currentPage={currentPage} subTitle={subTitle} />
 
         {/* Page content */}
         <main className="flex-1 p-4 p-6 overflow-auto bg-barber-card min-h-[calc(100vh-64px)]">

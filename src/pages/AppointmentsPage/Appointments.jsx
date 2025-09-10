@@ -88,14 +88,6 @@ const Appointments = () => {
 
   return (
     <div className="space-y-6 p-6">
-      {/* Header */}
-      <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-        <div>
-          <h1 className="text-gray-400">
-            Gerencie todos os agendamentos da barbearia
-          </h1>
-        </div>
-      </div>
 
       {/* Filters */}
       <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">

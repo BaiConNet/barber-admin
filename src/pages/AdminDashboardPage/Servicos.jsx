@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Scissors, Plus, Edit, Trash2, Clock, DollarSign, TrendingUp } from 'lucide-react';
+import { Scissors, Plus, Edit, Trash2, Clock, DollarSign, TrendingUp, ChevronDown } from 'lucide-react';
 import axios from 'axios';
 import { useAuth } from '../../context/AuthContext.jsx';
 
@@ -10,10 +10,10 @@ const Services = () => {
   const [loading, setLoading] = useState(true);
   const [erro, setErro] = useState('');
   const [modal, setModal] = useState({ aberto: false, tipo: 'criar', servico: null });
-  const [form, setForm] = useState({ nome: '', duracao: '', preco: '', category: '' });
+  const [form, setForm] = useState({ nome: '', duracao: '', preco: '', categoria: '' });
   const [selectedCategory, setSelectedCategory] = useState('Todos');
-
-  const categories = ['Todos', 'Corte', 'Barba', 'Combo', 'Premium', 'Estética', 'Tratamento'];
+  const [dropdownOpen, setDropdownOpen] = useState(false);
+  const categories = ['Todos', ...Array.from(new Set(services.map(s => s.categoria)))];
 
   const config = {
     headers: { Authorization: `Bearer ${auth?.token}` },
@@ -39,17 +39,24 @@ const Services = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      const payload = {
+        nome: form.nome,
+        duracao: Number(form.duracao),
+        preco: Number(form.preco),
+        categoria: form.categoria,
+      };
+
       if (modal.tipo === 'criar') {
-        await axios.post(`${import.meta.env.VITE_API_URL}/servico`, form, config);
+        await axios.post(`${import.meta.env.VITE_API_URL}/servico`, payload, config);
       } else if (modal.tipo === 'editar' && modal.servico) {
         await axios.put(
           `${import.meta.env.VITE_API_URL}/servico/${modal.servico._id}`,
-          form,
+          payload,
           config
         );
       }
       setModal({ aberto: false, tipo: 'criar', servico: null });
-      setForm({ nome: '', duracao: '', preco: '', category: '' });
+      setForm({ nome: '', duracao: '', preco: '', categoria: '' });
       listarServicos();
     } catch (err) {
       console.error(err);
@@ -69,7 +76,7 @@ const Services = () => {
   };
 
   const filteredServices = services.filter(
-    (s) => selectedCategory === 'Todos' || s.category === selectedCategory
+    (s) => selectedCategory === 'Todos' || s.categoria === selectedCategory
   );
 
   const totalRevenue = services.reduce((acc, s) => acc + (s.preco || 0), 0);
@@ -82,21 +89,59 @@ const Services = () => {
 
   return (
     <div className="space-y-6 p-6">
-      {/* Header */}
+      {/* Header com Novo Serviço + Filtro */}
       <div className="flex flex-col md:flex-row md:items-center md:justify-between space-y-4 md:space-y-0">
-        <div>
-          <h1 className="text-gray-400">Gerencie seus serviços da barbearia</h1>
+        <div className="flex items-center gap-4">
+
+          {/* Botão Novo Serviço */}
+          <motion.button
+            onClick={() => setModal({ aberto: true, tipo: 'criar', servico: null })}
+            className="flex items-center space-x-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-3 rounded-lg font-medium hover:from-amber-600 hover:to-orange-600 transition-colors"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <Plus className="w-5 h-5" />
+            <span>Novo Serviço</span>
+          </motion.button>
+
+          {/* Botão Filtrar Por */}
+          <div className="relative inline-block text-left">
+            <button
+              onClick={() => setDropdownOpen(!dropdownOpen)}
+              className="inline-flex justify-center rounded-md border border-gray-700 shadow-sm px-4 py-2 bg-gray-800 text-sm font-medium text-white hover:bg-gray-700 focus:outline-none"
+            >
+              Filtrar Por
+              <ChevronDown className="ml-2 h-4 w-4" />
+            </button>
+
+            {dropdownOpen && (
+              <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 z-50">
+                <div className="py-1">
+                  {categories.length > 0 ? (
+                    categories.map((category) => (
+                      <button
+                        key={category}
+                        onClick={() => {
+                          setSelectedCategory(category);
+                          setDropdownOpen(false);
+                        }}
+                        className={`w-full text-left px-4 py-2 text-sm ${
+                          selectedCategory === category
+                            ? 'bg-amber-500 text-white'
+                            : 'text-gray-300 hover:bg-gray-700'
+                        }`}
+                      >
+                        {category}
+                      </button>
+                    ))
+                  ) : (
+                    <p className="px-4 py-2 text-gray-400 text-sm">Nenhuma categoria disponível</p>
+                  )}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-        
-        <motion.button
-          onClick={() => setModal({ aberto: true, tipo: 'criar', servico: null })}
-          className="flex items-center space-x-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-3 rounded-lg font-medium hover:from-amber-600 hover:to-orange-600 transition-colors"
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
-        >
-          <Plus className="w-5 h-5" />
-          <span>Novo Serviço</span>
-        </motion.button>
       </div>
 
       {/* Stats Cards */}
@@ -150,25 +195,43 @@ const Services = () => {
         </motion.div>
       </div>
 
-      {/* Category Filter */}
-      <div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
-        <h3 className="text-lg font-semibold text-white mb-4">Filtrar por Categoria</h3>
-        <div className="flex flex-wrap gap-2">
-          {categories.map((category) => (
-            <button
-              key={category}
-              onClick={() => setSelectedCategory(category)}
-              className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                selectedCategory === category
-                  ? 'bg-amber-500 text-white'
-                  : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-              }`}
-            >
-              {category}
-            </button>
-          ))}
-        </div>
-      </div>
+      {/* Category Filter 
+      <div className="relative inline-block text-left mb-4">
+        <button
+          onClick={() => setDropdownOpen(!dropdownOpen)}
+          className="inline-flex justify-center w-full rounded-md border border-gray-700 shadow-sm px-4 py-2 bg-gray-800 text-sm font-medium text-white hover:bg-gray-700 focus:outline-none"
+        >
+          Filtrar Por
+          <ChevronDown className="ml-2 h-4 w-4" />
+        </button>
+
+        {dropdownOpen && (
+          <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 z-50">
+            <div className="py-1">
+              {categories.length > 0 ? (
+                categories.map((categoria) => (
+                  <button
+                    key={categoria}
+                    onClick={() => {
+                      setSelectedCategory(categoria);
+                      setDropdownOpen(false);
+                    }}
+                    className={`w-full text-left px-4 py-2 text-sm ${
+                      selectedCategory === categoria
+                        ? 'bg-amber-500 text-white'
+                        : 'text-gray-300 hover:bg-gray-700'
+                    }`}
+                  >
+                    {categoria}
+                  </button>
+                ))
+              ) : (
+                <p className="px-4 py-2 text-gray-400 text-sm">Nenhuma categoria disponível</p>
+              )}
+            </div>
+          </div>
+        )}
+      </div> */}
 
       {/* Services Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -188,7 +251,7 @@ const Services = () => {
                   <div>
                     <h3 className="text-lg font-semibold text-white">{service.nome}</h3>
                     <span className="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded-full">
-                      {service.category || 'Sem Categoria'}
+                      {service.categoria  || 'Sem Categoria'}
                     </span>
                   </div>
                 </div>
@@ -201,7 +264,7 @@ const Services = () => {
                         nome: service.nome,
                         duracao: service.duracao,
                         preco: service.preco,
-                        category: service.category || ''
+                        categoria: service.categoria || ''
                       });
                     }}
                   >
@@ -241,8 +304,8 @@ const Services = () => {
 
       {/* Modal criar/editar */}
       {modal.aberto && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex justify-center items-center">
-          <div className="bg-gray-900 p-6 rounded-xl w-96">
+        <div className="fixed inset-0 z-50 bg-black bg-opacity-50 flex justify-center items-center p-4 md:p-0 overflow-auto">
+          <div className="bg-gray-900 p-6 rounded-xl w-full max-w-md md:w-96 mx-auto">
             <h3 className="text-xl font-bold mb-4 text-white">
               {modal.tipo === 'criar' ? 'Novo Serviço' : 'Editar Serviço'}
             </h3>
@@ -274,9 +337,10 @@ const Services = () => {
               <input
                 type="text"
                 placeholder="Categoria"
-                value={form.category}
-                onChange={(e) => setForm({ ...form, category: e.target.value })}
+                value={form.categoria}
+                onChange={(e) => setForm({ ...form, categoria: e.target.value })}
                 className="w-full px-3 py-2 border rounded bg-gray-800 text-white"
+                required
               />
               <div className="flex justify-end gap-2 mt-2">
                 <button
