@@ -14,7 +14,7 @@ export default function ConfirmEmail() {
       return;
     }
 
-    axios.post(`${import.meta.env.VITE_API_URL}/user/confirm-email`, { token })
+    axios.post(`${import.meta.env.VITE_API_URL}/confirm-email`, { token })
       .then(() => {
         setStatus("sucesso");
         setTimeout(() => navigate("/login"), 3000);
