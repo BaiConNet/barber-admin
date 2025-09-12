@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useRef, useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Scissors, Plus, Edit, Trash2, Clock, DollarSign, TrendingUp, ChevronDown } from 'lucide-react';
 import axios from 'axios';
@@ -13,6 +13,7 @@ const Services = () => {
   const [form, setForm] = useState({ nome: '', duracao: '', preco: '', categoria: '' });
   const [selectedCategory, setSelectedCategory] = useState('Todos');
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const dropdownRef = useRef(null);
   const categories = ['Todos', ...Array.from(new Set(services.map(s => s.categoria)))];
 
   const config = {
@@ -31,6 +32,18 @@ const Services = () => {
       setLoading(false);
     }
   };
+  useEffect(() => {
+    function handleClickOutside(event) {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setDropdownOpen(false);
+      }
+    }
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   useEffect(() => {
     listarServicos();
@@ -96,19 +109,19 @@ const Services = () => {
           {/* Botão Novo Serviço */}
           <motion.button
             onClick={() => setModal({ aberto: true, tipo: 'criar', servico: null })}
-            className="flex items-center space-x-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-3 rounded-lg font-medium hover:from-amber-600 hover:to-orange-600 transition-colors"
+            className="flex items-center space-x-2 bg-gradient-to-r from-amber-500 to-orange-500 text-white px-3 py-1.5 text-xs rounded-md font-medium sm:px-4 sm:py-2 sm:text-sm md:px-5 md:py-2.5 md:text-base hover:from-amber-600 hover:to-orange-600 transition-colors"
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
           >
-            <Plus className="w-5 h-5" />
+            <Plus className="w-4 h-4" />
             <span>Novo Serviço</span>
           </motion.button>
 
           {/* Botão Filtrar Por */}
-          <div className="relative inline-block text-left">
+          <div className="relative inline-block text-left" ref={dropdownRef}>
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
-              className="inline-flex justify-center rounded-md border border-gray-700 shadow-sm px-4 py-2 bg-gray-800 text-sm font-medium text-white hover:bg-gray-700 focus:outline-none"
+              className="inline-flex justify-center rounded-md border border-gray-700 shadow-sm px-3 py-1.5 text-xs sm:px-4 sm:py-2 sm:text-sm bg-gray-800 font-medium text-white hover:bg-gray-700 focus:outline-none"
             >
               Filtrar Por
               <ChevronDown className="ml-2 h-4 w-4" />
@@ -145,154 +158,119 @@ const Services = () => {
       </div>
 
       {/* Stats Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-        <motion.div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <motion.div className="bg-gray-800 rounded-xl p-4 sm:p-6 border border-gray-700">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
-              <Scissors className="w-6 h-6 text-blue-400" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-blue-500/20 rounded-lg flex items-center justify-center">
+              <Scissors className="w-5 h-5 sm:w-6 sm:h-6 text-blue-400" />
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-white">{services.length}</h3>
-              <p className="text-gray-400 text-sm">Total de Serviços</p>
+              <h3 className="text-xl sm:text-2xl font-bold text-white">{services.length}</h3>
+              <p className="text-gray-400 text-xs sm:text-sm">Total de Serviços</p>
             </div>
           </div>
         </motion.div>
 
-        <motion.div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+        <motion.div className="bg-gray-800 rounded-xl p-4 sm:p-6 border border-gray-700">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
-              <DollarSign className="w-6 h-6 text-green-400" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-green-500/20 rounded-lg flex items-center justify-center">
+              <DollarSign className="w-5 h-5 sm:w-6 sm:h-6 text-green-400" />
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-white">R$ {averagePrice.toFixed(0)}</h3>
-              <p className="text-gray-400 text-sm">Preço Médio</p>
+              <h3 className="text-xl sm:text-2xl font-bold text-white">R$ {averagePrice.toFixed(0)}</h3>
+              <p className="text-gray-400 text-xs sm:text-sm">Preço Médio</p>
             </div>
           </div>
         </motion.div>
 
-        <motion.div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+        <motion.div className="bg-gray-800 rounded-xl p-4 sm:p-6 border border-gray-700">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
-              <Clock className="w-6 h-6 text-purple-400" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-purple-500/20 rounded-lg flex items-center justify-center">
+              <Clock className="w-5 h-5 sm:w-6 sm:h-6 text-purple-400" />
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-white">{averageDuration.toFixed(0)}min</h3>
-              <p className="text-gray-400 text-sm">Duração Média</p>
+              <h3 className="text-xl sm:text-2xl font-bold text-white">{averageDuration.toFixed(0)}min</h3>
+              <p className="text-gray-400 text-xs sm:text-sm">Duração Média</p>
             </div>
           </div>
         </motion.div>
 
-        <motion.div className="bg-gray-800 rounded-xl p-6 border border-gray-700">
+        <motion.div className="bg-gray-800 rounded-xl p-4 sm:p-6 border border-gray-700">
           <div className="flex items-center space-x-3">
-            <div className="w-12 h-12 bg-amber-500/20 rounded-lg flex items-center justify-center">
-              <TrendingUp className="w-6 h-6 text-amber-400" />
+            <div className="w-10 h-10 sm:w-12 sm:h-12 bg-amber-500/20 rounded-lg flex items-center justify-center">
+              <TrendingUp className="w-5 h-5 sm:w-6 sm:h-6 text-amber-400" />
             </div>
             <div>
-              <h3 className="text-2xl font-bold text-white">R$ {totalRevenue.toFixed(0)}</h3>
-              <p className="text-gray-400 text-sm">Receita Estimada</p>
+              <h3 className="text-xl sm:text-2xl font-bold text-white">R$ {totalRevenue.toFixed(0)}</h3>
+              <p className="text-gray-400 text-xs sm:text-sm">Receita Estimada</p>
             </div>
           </div>
         </motion.div>
       </div>
 
-      {/* Category Filter 
-      <div className="relative inline-block text-left mb-4">
-        <button
-          onClick={() => setDropdownOpen(!dropdownOpen)}
-          className="inline-flex justify-center w-full rounded-md border border-gray-700 shadow-sm px-4 py-2 bg-gray-800 text-sm font-medium text-white hover:bg-gray-700 focus:outline-none"
-        >
-          Filtrar Por
-          <ChevronDown className="ml-2 h-4 w-4" />
-        </button>
-
-        {dropdownOpen && (
-          <div className="origin-top-right absolute right-0 mt-2 w-48 rounded-md shadow-lg bg-gray-800 ring-1 ring-black ring-opacity-5 z-50">
-            <div className="py-1">
-              {categories.length > 0 ? (
-                categories.map((categoria) => (
-                  <button
-                    key={categoria}
-                    onClick={() => {
-                      setSelectedCategory(categoria);
-                      setDropdownOpen(false);
-                    }}
-                    className={`w-full text-left px-4 py-2 text-sm ${
-                      selectedCategory === categoria
-                        ? 'bg-amber-500 text-white'
-                        : 'text-gray-300 hover:bg-gray-700'
-                    }`}
-                  >
-                    {categoria}
-                  </button>
-                ))
-              ) : (
-                <p className="px-4 py-2 text-gray-400 text-sm">Nenhuma categoria disponível</p>
-              )}
-            </div>
-          </div>
-        )}
-      </div> */}
-
       {/* Services Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mt-6">
         {loading ? (
           <p className="text-gray-400 col-span-full text-center">Carregando serviços...</p>
         ) : filteredServices.length > 0 ? (
           filteredServices.map((service) => (
             <motion.div
               key={service._id}
-              className="bg-gray-800 rounded-xl border border-gray-700 p-6 hover:border-gray-600 transition-colors"
+              className="bg-gray-800 rounded-xl border border-gray-700 p-4 sm:p-6 hover:border-gray-600 transition-colors"
             >
-              <div className="flex items-start justify-between mb-4">
+              <div className="flex items-start justify-between mb-3 sm:mb-4">
                 <div className="flex items-center space-x-3">
-                  <div className="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg flex items-center justify-center">
-                    <Scissors className="w-6 h-6 text-white" />
+                  <div className="w-10 h-10 sm:w-12 sm:h-12 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg flex items-center justify-center">
+                    <Scissors className="w-5 h-5 sm:w-6 sm:h-6 text-white" />
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-white">{service.nome}</h3>
-                    <span className="text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded-full">
-                      {service.categoria  || 'Sem Categoria'}
+                    <h3 className="text-base sm:text-lg font-semibold text-white">{service.nome}</h3>
+                    <span className="text-[10px] sm:text-xs bg-gray-700 text-gray-300 px-2 py-1 rounded-full">
+                      {service.categoria || "Sem Categoria"}
                     </span>
                   </div>
                 </div>
                 <div className="flex space-x-2">
                   <button
-                    className="p-2 text-gray-400 hover:text-blue-400 transition-colors"
+                    className="p-1.5 sm:p-2 text-gray-400 hover:text-blue-400 transition-colors"
                     onClick={() => {
-                      setModal({ aberto: true, tipo: 'editar', servico: service });
+                      setModal({ aberto: true, tipo: "editar", servico: service });
                       setForm({
                         nome: service.nome,
                         duracao: service.duracao,
                         preco: service.preco,
-                        categoria: service.categoria || ''
+                        categoria: service.categoria || "",
                       });
                     }}
                   >
-                    <Edit className="w-4 h-4" />
+                    <Edit className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </button>
                   <button
-                    className="p-2 text-gray-400 hover:text-red-400 transition-colors"
+                    className="p-1.5 sm:p-2 text-gray-400 hover:text-red-400 transition-colors"
                     onClick={() => excluirServico(service._id)}
                   >
-                    <Trash2 className="w-4 h-4" />
+                    <Trash2 className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                   </button>
                 </div>
               </div>
-              <p className="text-gray-400 text-sm mb-4">{service.description || '-'}</p>
-              <div className="space-y-3">
+              <div className="space-y-2 sm:space-y-3">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <DollarSign className="w-4 h-4 text-green-400" />
-                    <span className="text-gray-300">Preço</span>
+                    <DollarSign className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-green-400" />
+                    <span className="text-gray-300 text-xs sm:text-sm">Preço</span>
                   </div>
-                  <span className="text-green-400 font-bold">R$ {service.preco}</span>
+                  <span className="text-green-400 font-bold text-sm sm:text-base">
+                    R$ {service.preco}
+                  </span>
                 </div>
                 <div className="flex items-center justify-between">
                   <div className="flex items-center space-x-2">
-                    <Clock className="w-4 h-4 text-blue-400" />
-                    <span className="text-gray-300">Duração</span>
+                    <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-blue-400" />
+                    <span className="text-gray-300 text-xs sm:text-sm">Duração</span>
                   </div>
-                  <span className="text-blue-400 font-medium">{service.duracao}min</span>
+                  <span className="text-blue-400 font-medium text-sm sm:text-base">
+                    {service.duracao}min
+                  </span>
                 </div>
               </div>
             </motion.div>
