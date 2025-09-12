@@ -10,6 +10,7 @@ import ForgotPassword from "../pages/ForgotPasswordPage/ForgotPassword.jsx";
 import ResetPassword from "../pages/ResetPasswordPage/ResetPassword.jsx";
 import PrivateLayout from "../components/PrivateLayout.jsx";
 import PrivateRoute from "../components/PrivateRoute.jsx";
+import ConfirmEmail from "../pages/ConfirmEmailPage/ConfirmEmail.jsx";
 
 export default function AppRoutes() {
   return (
@@ -19,6 +20,7 @@ export default function AppRoutes() {
       <Route path="/register" element={<Register />} />
       <Route path="/forgot-password" element={<ForgotPassword />} />
       <Route path="/reset-password/:token" element={<ResetPassword />} />
+      <Route path="/confirm-email" element={<ConfirmEmail />} />
 
       {/* Rotas privadas */}
       <Route
