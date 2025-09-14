@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import StatsCard from "../../components/StatsCard.jsx";
 import RevenueChart from "../../components/RevenueChart.jsx";
 import AppointmentsList from "../../components/AppointmentsList.jsx";
@@ -12,7 +12,7 @@ import {
   Scissors,
 } from "lucide-react";
 import { motion } from "framer-motion";
-import usePainelDashboard from "../../hooks/usePainelDashboard";
+import usePainelDashboard from "../../hooks/usePainelDashboard.js";
 import { useAuth } from "../../context/AuthContext";
 
 export default function Dashboard() {
@@ -21,43 +21,90 @@ export default function Dashboard() {
   const token = auth?.token;
   const { data, loading, error } = usePainelDashboard(token);
 
-  // Exemplo de mapeamento dos dados reais para os cards (ajuste conforme o retorno da API)
-  const stats = data
-    ? [
-        {
-          title: "Faturamento Hoje",
-          value: data.faturamentoHoje ? `R$ ${data.faturamentoHoje}` : "-",
-          change: data.faturamentoChange || "+0%",
-          trend: data.faturamentoTrend || "up",
-          icon: DollarSign,
-          color: "green",
-        },
-        {
-          title: "Agendamentos Hoje",
-          value: data.agendamentosHoje || "-",
-          change: data.agendamentosChange || "+0%",
-          trend: data.agendamentosTrend || "up",
-          icon: Calendar,
-          color: "blue",
-        },
-        {
-          title: "Clientes Ativos",
-          value: data.clientesAtivos || "-",
-          change: data.clientesChange || "+0%",
-          trend: data.clientesTrend || "up",
-          icon: Users,
-          color: "purple",
-        },
-        {
-          title: "Avaliação Média",
-          value: data.avaliacaoMedia || "-",
-          change: data.avaliacaoChange || "+0",
-          trend: data.avaliacaoTrend || "up",
-          icon: Star,
-          color: "yellow",
-        },
-      ]
-    : [];
+  // Processa os dados vindos da API para o formato esperado pelo Dashboard
+  const processed = useMemo(() => {
+    if (!data) return {};
+
+    const hoje = new Date().toISOString().slice(0, 10);
+
+    // Agendamentos de hoje
+    const agendamentosHoje = data.agendamentos?.filter(a =>
+      a.criadoEm?.startsWith(hoje)
+    ) || [];
+
+    // Faturamento de hoje (somando os valores dos serviços dos agendamentos)
+    const faturamentoHoje = agendamentosHoje.reduce((acc, ag) => {
+      acc += Number(ag.servico?.preco || 0);
+      return acc;
+    }, 0);
+
+    // Receita mensal (MM/YYYY)
+    const receitaPorMes = {};
+    data.agendamentos?.forEach(a => {
+      if (!a.criadoEm) return;
+      const date = new Date(a.criadoEm);
+      const mesAno = `${String(date.getMonth() + 1).padStart(2, "0")}/${date.getFullYear()}`;
+      const valor = Number(a.servico?.preco || 0);
+      receitaPorMes[mesAno] = (receitaPorMes[mesAno] || 0) + valor;
+    });
+
+    const graficoReceita = Object.entries(receitaPorMes)
+      .sort(([mesA], [mesB]) => new Date(`01/${mesA}`) - new Date(`01/${mesB}`))
+      .map(([mes, valor]) => ({ dia: mes, valor }));
+
+    return {
+      faturamentoHoje,
+      agendamentosHoje: agendamentosHoje.length,
+      clientesAtivos: data.clientes?.length || 0,
+      avaliacaoMedia: 4.8, // mock, ajuste quando tiver feedbacks
+      graficoReceita,
+      tempoMedio: "45min", // mock
+      taxaOcupacao: "80%", // mock
+      servicosRealizados: data.servicos?.length || 0,
+      servicosPopulares: data.servicos?.slice(0, 3).map(s => ({
+        nome: s.nome,
+        valor: s.preco,
+      })) || [],
+      agendamentosRecentes: data.agendamentos?.slice(-5) || [],
+    };
+  }, [data]);
+
+  const stats = [
+    {
+      title: "Faturamento Hoje",
+      value: processed.faturamentoHoje
+        ? `R$ ${processed.faturamentoHoje}`
+        : "-",
+      change: "+0%",
+      trend: "up",
+      icon: DollarSign,
+      color: "green",
+    },
+    {
+      title: "Agendamentos Hoje",
+      value: processed.agendamentosHoje || "-",
+      change: "+0%",
+      trend: "up",
+      icon: Calendar,
+      color: "blue",
+    },
+    {
+      title: "Clientes Ativos",
+      value: processed.clientesAtivos || "-",
+      change: "+0%",
+      trend: "up",
+      icon: Users,
+      color: "purple",
+    },
+    {
+      title: "Avaliação Média",
+      value: processed.avaliacaoMedia || "-",
+      change: "+0",
+      trend: "up",
+      icon: Star,
+      color: "yellow",
+    },
+  ];
 
   if (loading) {
     return (
@@ -100,7 +147,7 @@ export default function Dashboard() {
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.4, delay: 0.2 }}
         >
-          <RevenueChart data={data?.graficoReceita} />
+          <RevenueChart data={processed.graficoReceita} />
         </motion.div>
 
         {/* Quick Stats */}
@@ -124,7 +171,7 @@ export default function Dashboard() {
                   <span className="text-gray-300">Tempo Médio</span>
                 </div>
                 <span className="text-white font-medium">
-                  {data?.tempoMedio || "-"}
+                  {processed.tempoMedio || "-"}
                 </span>
               </div>
               <div className="flex items-center justify-between">
@@ -135,7 +182,7 @@ export default function Dashboard() {
                   <span className="text-gray-300">Taxa Ocupação</span>
                 </div>
                 <span className="text-white font-medium">
-                  {data?.taxaOcupacao || "-"}
+                  {processed.taxaOcupacao || "-"}
                 </span>
               </div>
               <div className="flex items-center justify-between">
@@ -146,7 +193,7 @@ export default function Dashboard() {
                   <span className="text-gray-300">Serviços Realizados</span>
                 </div>
                 <span className="text-white font-medium">
-                  {data?.servicosRealizados || "-"}
+                  {processed.servicosRealizados || "-"}
                 </span>
               </div>
             </div>
@@ -158,7 +205,7 @@ export default function Dashboard() {
               Serviços Populares
             </h3>
             <div className="space-y-3">
-              {data?.servicosPopulares?.map((servico, idx) => (
+              {processed.servicosPopulares?.map((servico, idx) => (
                 <div
                   key={servico.nome + idx}
                   className="flex justify-between items-center"
@@ -180,7 +227,7 @@ export default function Dashboard() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.4 }}
       >
-        <AppointmentsList data={data?.agendamentosRecentes} />
+        <AppointmentsList data={processed.agendamentosRecentes} />
       </motion.div>
     </div>
   );

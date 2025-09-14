@@ -24,7 +24,6 @@ export function AuthProvider({ children }) {
   }, [auth]);
 
   const login = (data) => {
-    // data = { token, user } vindo do backend
     setAuth(data);
   };
 
