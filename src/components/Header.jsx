@@ -8,6 +8,7 @@ import useNotifications from "../hooks/useNotifications";
 const pageNames = {
   dashboard: "Dashboard",
   appointments: "Agendamentos",
+  horarios: "Horarios",
   clients: "Clientes",
   services: "Serviços",
   analytics: "Relatórios",

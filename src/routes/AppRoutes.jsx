@@ -57,7 +57,7 @@ export default function AppRoutes() {
         path="/horarios"
         element={
           <PrivateRoute>
-            <PrivateLayout>
+            <PrivateLayout currentPage="horarios" subTitle="Crie seus horarios da barbearia">
               <Horarios />
             </PrivateLayout>
           </PrivateRoute>
