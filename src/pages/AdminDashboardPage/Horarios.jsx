@@ -122,48 +122,90 @@ export default function Horarios() {
   }
 
   return (
-    <div className="p-6 bg-barber-card min-h-screen text-gray-100">
-
-      {/* Formulário */}
-      <form onSubmit={criarHorario} className="bg-gray-800 p-4 rounded-lg shadow-md flex gap-4 items-end flex-wrap">
-        <div className="flex flex-col">
+    <div className="p-3 sm:p-6 bg-barber-card min-h-screen text-gray-100 overflow-x-hidden">
+    {/* Formulário */}
+      <form
+        onSubmit={criarHorario}
+        className="bg-gray-800 p-4 rounded-lg shadow-md flex flex-col sm:flex-row sm:flex-wrap gap-4"
+      >
+        <div className="flex flex-col w-full sm:w-auto">
           <label className="text-sm font-medium text-gray-300">Data</label>
-          <input type="date" value={data} onChange={(e) => setData(e.target.value)} required className="border rounded px-2 py-1 bg-gray-700 text-white border-gray-600"/>
+          <input
+            type="date"
+            value={data}
+            onChange={(e) => setData(e.target.value)}
+            required
+            className="border rounded px-2 py-1 bg-gray-700 text-white border-gray-600 w-full"
+          />
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-col w-full sm:w-auto">
           <label className="text-sm font-medium text-gray-300">Hora Início</label>
-          <input type="time" value={horaInicio} onChange={(e) => setHoraInicio(e.target.value)} required className="border rounded px-2 py-1 bg-gray-700 text-white border-gray-600"/>
+          <input
+            type="time"
+            value={horaInicio}
+            onChange={(e) => setHoraInicio(e.target.value)}
+            required
+            className="border rounded px-2 py-1 bg-gray-700 text-white border-gray-600 w-full"
+          />
         </div>
-        <div className="flex flex-col">
+        <div className="flex flex-col w-full sm:w-auto">
           <label className="text-sm font-medium text-gray-300">Hora Fim</label>
-          <input type="time" value={horaFim} onChange={(e) => setHoraFim(e.target.value)} required className="border rounded px-2 py-1 bg-gray-700 text-white border-gray-600"/>
+          <input
+            type="time"
+            value={horaFim}
+            onChange={(e) => setHoraFim(e.target.value)}
+            required
+            className="border rounded px-2 py-1 bg-gray-700 text-white border-gray-600 w-full"
+          />
         </div>
-        <button type="submit" disabled={loading} className="flex items-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition">
-          <PlusCircle size={18}/> {loading ? "Salvando..." : "Adicionar"}
+        <button
+          type="submit"
+          disabled={loading}
+          className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition w-full sm:w-auto"
+        >
+          <PlusCircle size={18} /> {loading ? "Salvando..." : "Adicionar"}
         </button>
       </form>
 
       {/* Filtro */}
-      <div className="mt-6 flex gap-3">
-        {["todos","disponivel","indisponivel"].map((status)=>{
-          const colors = { todos: "bg-indigo-600 text-white", disponivel: "bg-green-600 text-white", indisponivel: "bg-red-600 text-white" };
-          return <button key={status} onClick={()=>setFiltro(status)} className={`px-3 py-1 rounded ${filtro===status?colors[status]:"bg-gray-700 text-gray-300"}`}>
-            {status==="todos"?"Todos":status==="disponivel"?"Disponíveis":"Indisponíveis"}
-          </button>
+      <div className="mt-6 flex flex-wrap gap-2">
+        {["todos", "disponivel", "indisponivel"].map((status) => {
+          const colors = {
+            todos: "bg-indigo-600 text-white",
+            disponivel: "bg-green-600 text-white",
+            indisponivel: "bg-red-600 text-white",
+          };
+          return (
+            <button
+              key={status}
+              onClick={() => setFiltro(status)}
+              className={`px-3 py-1 rounded text-sm w-full sm:w-auto ${
+                filtro === status ? colors[status] : "bg-gray-700 text-gray-300"
+              }`}
+            >
+              {status === "todos"
+                ? "Todos"
+                : status === "disponivel"
+                ? "Disponíveis"
+                : "Indisponíveis"}
+            </button>
+          );
         })}
       </div>
 
       {/* Lista em colunas */}
-      <div className="mt-6 flex flex-wrap gap-4">
+      <div className="mt-6 flex flex-col sm:flex-row sm:flex-wrap gap-4">
         {Object.keys(horariosPorData).length === 0 ? (
           <p className="text-gray-400">Nenhum horário encontrado.</p>
         ) : (
           Object.entries(horariosPorData).map(([data, lista]) => (
             <div
               key={data}
-              className="bg-gray-700 p-4 rounded-lg shadow-md flex-1 min-w-[220px] sm:min-w-[48%] md:min-w-[30%]"
+              className="bg-gray-700 p-4 rounded-lg shadow-md w-full sm:flex-1 sm:min-w-[48%] md:min-w-[30%]"
             >
-              <h4 className="text-gray-300 text-base font-semibold">{diaDaSemana(data)}</h4>
+              <h4 className="text-gray-300 text-base font-semibold">
+                {diaDaSemana(data)}
+              </h4>
               <h3 className="font-bold text-sm mb-2">📅 {data}</h3>
               <ul className="divide-y divide-gray-600">
                 {lista
@@ -187,7 +229,9 @@ export default function Horarios() {
                       </div>
                       <div className="flex gap-1 flex-wrap">
                         <button
-                          onClick={() => toggleDisponibilidade(h._id, h.isDisponivel)}
+                          onClick={() =>
+                            toggleDisponibilidade(h._id, h.isDisponivel)
+                          }
                           className={`px-2 py-0.5 rounded text-white text-xs font-medium ${
                             h.isDisponivel
                               ? "bg-yellow-600 hover:bg-yellow-500"
@@ -216,7 +260,6 @@ export default function Horarios() {
           ))
         )}
       </div>
-
       {/* Modal */}
       {modalAberto && (
         <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-50 p-2">
@@ -261,7 +304,6 @@ export default function Horarios() {
           </div>
         </div>
       )}
-
     </div>
   );
 }
