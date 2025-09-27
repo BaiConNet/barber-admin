@@ -2,8 +2,8 @@ import { useEffect, useState, useRef } from "react";
 import { io } from "socket.io-client";
 import axios from "axios";
 
-const SOCKET_URL = import.meta.env.VITE_API_URL; // URL do seu backend
-const API_URL = `${SOCKET_URL}/notificacoes`; // rota de notificações
+const SOCKET_URL = import.meta.env.VITE_API_URL;
+const API_URL = `${SOCKET_URL}/notificacoes`;
 
 export default function useNotifications(userId, token) {
   const [notifications, setNotifications] = useState([]);

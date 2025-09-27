@@ -18,7 +18,7 @@ const pageNames = {
 export default function Header({ currentPage, subTitle }) {
   const { auth, logout } = useAuth();
   const navigate = useNavigate();
-  const { notifications } = useNotifications(auth?.user?._id);
+  const { notifications, markAsRead } = useNotifications(auth?.user?._id, auth?.token);
 
   const [menuOpen, setMenuOpen] = useState(false);
   const [notiOpen, setNotiOpen] = useState(false);
@@ -55,9 +55,9 @@ export default function Header({ currentPage, subTitle }) {
               className="relative p-2 rounded-lg hover:bg-gray-700 transition-colors"
             >
               <Bell className="w-5 h-5 text-gray-300" />
-              {notifications.length > 0 && (
+              {notifications.filter((n) => !n.lida).length > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
-                  {notifications.length}
+                  {notifications.filter((n) => !n.lida).length}
                 </span>
               )}
             </button>
@@ -67,10 +67,12 @@ export default function Header({ currentPage, subTitle }) {
                 {notifications.length === 0 && (
                   <p className="text-gray-300 px-4 py-2">Sem notificações</p>
                 )}
-                {notifications.map((noti, idx) => (
+                {notifications.map((noti) => (
                   <div
-                    key={idx}
-                    className="px-4 py-2 border-b border-gray-600 text-gray-200"
+                    key={noti._id}
+                    onClick={() => markAsRead(noti._id)}
+                    className={`px-4 py-2 border-b border-gray-600 cursor-pointer transition 
+                      ${noti.lida ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-600 hover:bg-gray-500"}`}
                   >
                     {noti.title && <p className="font-semibold">{noti.title}</p>}
                     <p className="text-sm">{noti.message}</p>

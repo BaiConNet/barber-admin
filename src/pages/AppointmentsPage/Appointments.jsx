@@ -202,10 +202,10 @@ const Appointments = () => {
                   <div className="flex flex-col sm:flex-row sm:items-center sm:space-x-4 gap-2">
                     <span
                       className={`px-3 py-1 rounded-full text-xs font-medium border text-center ${
-                        statusConfig[appointment.status].color
+                        statusConfig[appointment.status]?.color || "bg-gray-500/20 text-gray-400 border-gray-500/30"
                       }`}
                     >
-                      {statusConfig[appointment.status].label}
+                      {statusConfig[appointment.status]?.label || "Sem status"}
                     </span>
 
                     {/* Botão de cancelar só aparece se status NÃO for CANCELADO */}

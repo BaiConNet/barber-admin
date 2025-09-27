@@ -11,6 +11,7 @@ export default function Horarios() {
   const [horaFim, setHoraFim] = useState("");
   const [loading, setLoading] = useState(false);
   const [filtro, setFiltro] = useState("todos");
+  const [filtroDia, setFiltroDia] = useState("todos");
 
   // Modal de edição
   const [modalAberto, setModalAberto] = useState(false);
@@ -100,9 +101,32 @@ export default function Horarios() {
     if (auth?.user?._id) fetchHorarios();
   }, [auth]);
 
+  const diasSemana = [
+    "todos",
+    "Domingo",
+    "Segunda-feira",
+    "Terça-feira",
+    "Quarta-feira",
+    "Quinta-feira",
+    "Sexta-feira",
+    "Sábado",
+  ];
+  const diaDaSemana = (dataStr) => {
+    const dias = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+    const [dia, mes, ano] = dataStr.split("/").map(Number);
+    const d = new Date(Date.UTC(ano, mes - 1, dia));
+    return dias[d.getUTCDay()];
+  }
+
   const horariosFiltrados = horarios.filter((h) => {
-    if (filtro === "disponivel") return h.isDisponivel;
-    if (filtro === "indisponivel") return !h.isDisponivel;
+    if (filtro === "disponivel" && !h.isDisponivel) return false;
+    if (filtro === "indisponivel" && h.isDisponivel) return false;
+
+    const dataStr = new Date(h.data).toLocaleDateString("pt-BR", { timeZone: "UTC" });
+    const diaSemanaAtual = diaDaSemana(dataStr);
+
+    if (filtroDia  !== "todos" && filtroDia !== diaSemanaAtual) return false;
+
     return true;
   });
 
@@ -114,132 +138,151 @@ export default function Horarios() {
     return acc;
   }, {});
 
-  const diaDaSemana = (dataStr) => {
-    const dias = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
-    const [dia, mes, ano] = dataStr.split("/").map(Number);
-    const d = new Date(Date.UTC(ano, mes - 1, dia));
-    return dias[d.getUTCDay()];
-  }
-
   return (
     <div className="p-3 sm:p-6 bg-barber-card min-h-screen text-gray-100 overflow-x-hidden">
-    {/* Formulário */}
+      {/* Formulário */}
       <form
         onSubmit={criarHorario}
         className="bg-gray-800 p-4 rounded-lg shadow-md flex flex-col sm:flex-row sm:flex-wrap gap-4"
       >
         <div className="flex flex-col w-full sm:w-auto">
-          <label className="text-sm font-medium text-gray-300">Data</label>
+          <label className="text-xs sm:text-sm font-medium text-gray-300">
+            Data
+          </label>
           <input
             type="date"
             value={data}
             onChange={(e) => setData(e.target.value)}
             required
-            className="border rounded px-2 py-1 bg-gray-700 text-white border-gray-600 w-full"
+            className="border rounded px-2 py-1 bg-gray-700 text-white border-gray-600 w-full text-sm"
           />
         </div>
         <div className="flex flex-col w-full sm:w-auto">
-          <label className="text-sm font-medium text-gray-300">Hora Início</label>
+          <label className="text-xs sm:text-sm font-medium text-gray-300">
+            Hora Início
+          </label>
           <input
             type="time"
             value={horaInicio}
             onChange={(e) => setHoraInicio(e.target.value)}
             required
-            className="border rounded px-2 py-1 bg-gray-700 text-white border-gray-600 w-full"
+            className="border rounded px-2 py-1 bg-gray-700 text-white border-gray-600 w-full text-sm"
           />
         </div>
         <div className="flex flex-col w-full sm:w-auto">
-          <label className="text-sm font-medium text-gray-300">Hora Fim</label>
+          <label className="text-xs sm:text-sm font-medium text-gray-300">
+            Hora Fim
+          </label>
           <input
             type="time"
             value={horaFim}
             onChange={(e) => setHoraFim(e.target.value)}
             required
-            className="border rounded px-2 py-1 bg-gray-700 text-white border-gray-600 w-full"
+            className="border rounded px-2 py-1 bg-gray-700 text-white border-gray-600 w-full text-sm"
           />
         </div>
         <button
           type="submit"
           disabled={loading}
-          className="flex items-center justify-center gap-2 bg-indigo-600 text-white px-4 py-2 rounded hover:bg-indigo-700 transition w-full sm:w-auto"
+          className="flex items-center justify-center gap-1 bg-indigo-600 text-white px-3 py-2 rounded hover:bg-indigo-700 transition w-full sm:w-auto text-sm"
         >
-          <PlusCircle size={18} /> {loading ? "Salvando..." : "Adicionar"}
+          <PlusCircle size={16} /> {loading ? "Salvando..." : "Adicionar"}
         </button>
       </form>
 
-      {/* Filtro */}
-      <div className="mt-6 flex flex-wrap gap-2">
-        {["todos", "disponivel", "indisponivel"].map((status) => {
-          const colors = {
-            todos: "bg-indigo-600 text-white",
-            disponivel: "bg-green-600 text-white",
-            indisponivel: "bg-red-600 text-white",
-          };
-          return (
-            <button
-              key={status}
-              onClick={() => setFiltro(status)}
-              className={`px-3 py-1 rounded text-sm w-full sm:w-auto ${
-                filtro === status ? colors[status] : "bg-gray-700 text-gray-300"
-              }`}
-            >
-              {status === "todos"
-                ? "Todos"
-                : status === "disponivel"
-                ? "Disponíveis"
-                : "Indisponíveis"}
-            </button>
-          );
-        })}
+      {/* Filtros */}
+      <div className="mt-6 flex flex-col sm:flex-row gap-4">
+        {/* Filtro de disponibilidade */}
+        <div className="flex flex-wrap gap-2">
+          {["todos", "disponivel", "indisponivel"].map((status) => {
+            const colors = {
+              todos: "bg-indigo-600 text-white",
+              disponivel: "bg-green-600 text-white",
+              indisponivel: "bg-red-600 text-white",
+            };
+            return (
+              <button
+                key={status}
+                onClick={() => setFiltro(status)}
+                className={`px-3 py-1 rounded text-xs sm:text-sm ${
+                  filtro === status
+                    ? colors[status]
+                    : "bg-gray-700 text-gray-300"
+                }`}
+              >
+                {status === "todos"
+                  ? "Todos"
+                  : status === "disponivel"
+                  ? "Disponíveis"
+                  : "Indisponíveis"}
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Filtro por dia da semana */}
+        <select
+          value={filtroDia}
+          onChange={(e) => setFiltroDia(e.target.value)}
+          className="bg-gray-700 text-white px-3 py-1 rounded text-xs sm:text-sm border border-gray-600 w-full sm:w-auto"
+        >
+          {diasSemana.map((dia) => (
+            <option key={dia} value={dia}>
+              {dia === "todos" ? "Todos os dias" : dia}
+            </option>
+          ))}
+        </select>
       </div>
 
       {/* Lista em colunas */}
       <div className="mt-6 flex flex-col sm:flex-row sm:flex-wrap gap-4">
         {Object.keys(horariosPorData).length === 0 ? (
-          <p className="text-gray-400">Nenhum horário encontrado.</p>
+          <p className="text-gray-400 text-sm">Nenhum horário encontrado.</p>
         ) : (
           Object.entries(horariosPorData).map(([data, lista]) => (
             <div
               key={data}
               className="bg-gray-700 p-4 rounded-lg shadow-md w-full sm:flex-1 sm:min-w-[48%] md:min-w-[30%]"
             >
-              <h4 className="text-gray-300 text-base font-semibold">
-                {diaDaSemana(data)}
+              <h4 className="text-gray-300 text-sm sm:text-base font-semibold flex justify-between items-center">
+                <span>{diaDaSemana(data)}</span>
+                <span
+                  className={`w-3 h-3 rounded-full ${
+                    lista.some((h) => h.isDisponivel)
+                      ? "bg-green-500"
+                      : "bg-red-500"
+                  }`}
+                  title={
+                    lista.some((h) => h.isDisponivel)
+                      ? "Disponível"
+                      : "Indisponível"
+                  }
+                />
               </h4>
-              <h3 className="font-bold text-sm mb-2">📅 {data}</h3>
+              <h3 className="font-bold text-xs sm:text-sm mb-2">📅 {data}</h3>
               <ul className="divide-y divide-gray-600">
                 {lista
                   .sort((a, b) => a.horaInicio.localeCompare(b.horaInicio))
                   .map((h) => (
                     <li
                       key={h._id}
-                      className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-2 gap-2"
+                      className="flex justify-between items-center py-2 gap-2 text-sm"
                     >
-                      <div>
-                        ⏰ {h.horaInicio} - {h.horaFim}{" "}
-                        <span
-                          className={`ml-0 sm:ml-1 px-1 py-0.5 rounded text-sm ${
-                            h.isDisponivel
-                              ? "bg-green-700 text-green-100"
-                              : "bg-red-700 text-red-100"
-                          }`}
-                        >
-                          {h.isDisponivel ? "Disponível" : "Indisponível"}
-                        </span>
-                      </div>
-                      <div className="flex gap-1 flex-wrap">
-                        <button
-                          onClick={() =>
+                      <div className="flex items-center gap-2">
+                        <input
+                          type="checkbox"
+                          checked={h.isDisponivel}
+                          onChange={() =>
                             toggleDisponibilidade(h._id, h.isDisponivel)
                           }
-                          className={`px-2 py-0.5 rounded text-white text-xs font-medium ${
-                            h.isDisponivel
-                              ? "bg-yellow-600 hover:bg-yellow-500"
-                              : "bg-purple-600 hover:bg-purple-500"
-                          }`}
-                        >
-                          Alternar
-                        </button>
+                          className="w-4 h-4 accent-green-600"
+                        />
+                        <span>
+                          {h.horaInicio} - {h.horaFim}
+                        </span>
+                      </div>
+
+                      <div className="flex gap-1">
                         <button
                           onClick={() => abrirModal(h)}
                           className="px-2 py-0.5 rounded bg-blue-600 hover:bg-blue-500 text-white text-xs"
@@ -270,33 +313,39 @@ export default function Horarios() {
             >
               <X size={18} />
             </button>
-            <h2 className="text-lg font-semibold mb-4">Editar Horário</h2>
+            <h2 className="text-base sm:text-lg font-semibold mb-4">
+              Editar Horário
+            </h2>
             <div className="flex flex-col gap-3">
-              <label className="text-sm font-medium text-gray-300">Hora Início</label>
+              <label className="text-xs sm:text-sm font-medium text-gray-300">
+                Hora Início
+              </label>
               <input
                 type="time"
                 value={novoInicio}
                 onChange={(e) => setNovoInicio(e.target.value)}
-                className="border rounded px-2 py-1 bg-gray-700 text-white border-gray-600 w-full"
+                className="border rounded px-2 py-1 bg-gray-700 text-white border-gray-600 w-full text-sm"
               />
-              <label className="text-sm font-medium text-gray-300">Hora Fim</label>
+              <label className="text-xs sm:text-sm font-medium text-gray-300">
+                Hora Fim
+              </label>
               <input
                 type="time"
                 value={novoFim}
                 onChange={(e) => setNovoFim(e.target.value)}
-                className="border rounded px-2 py-1 bg-gray-700 text-white border-gray-600 w-full"
+                className="border rounded px-2 py-1 bg-gray-700 text-white border-gray-600 w-full text-sm"
               />
             </div>
             <div className="mt-4 flex flex-col sm:flex-row justify-end gap-2">
               <button
                 onClick={() => setModalAberto(false)}
-                className="px-4 py-2 rounded bg-gray-600 hover:bg-gray-500 text-white w-full sm:w-auto"
+                className="px-4 py-2 rounded bg-gray-600 hover:bg-gray-500 text-white w-full sm:w-auto text-sm"
               >
                 Cancelar
               </button>
               <button
                 onClick={salvarAlteracao}
-                className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-500 text-white w-full sm:w-auto"
+                className="px-4 py-2 rounded bg-blue-600 hover:bg-blue-500 text-white w-full sm:w-auto text-sm"
               >
                 Salvar
               </button>
