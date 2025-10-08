@@ -1,14 +1,10 @@
 import { useState } from "react";
 import axios from "axios";
 import { useNavigate, Link } from "react-router-dom";
-import Logo from '../../components/Logo'; // Importe o Logo
 import { Eye, EyeOff, Loader2, HelpCircle } from "lucide-react";
-import toast from 'react-hot-toast';
 
 export default function Register() {
   const navigate = useNavigate();
-
-  // --- TODA A SUA LÓGICA DE ESTADO E VALIDAÇÃO FOI 100% PRESERVADA ---
   const [form, setForm] = useState({
     nome: "",
     email: "",
@@ -16,15 +12,18 @@ export default function Register() {
     senha: "",
     role: "BARBEIRO",
   });
+
   const [erro, setErro] = useState("");
   const [loading, setLoading] = useState(false);
   const [mostrarSenha, setMostrarSenha] = useState(false);
+
   const [touched, setTouched] = useState({
     nome: false,
     email: false,
     telefone: false,
     senha: false,
   });
+
   const [senhaValida, setSenhaValida] = useState({
     maiuscula: false,
     minuscula: false,
@@ -35,8 +34,11 @@ export default function Register() {
   const handleChange = (e) => {
     const { name, value } = e.target;
     let valor = value;
+
     if (name === "telefone") valor = valor.replace(/\D/g, "").slice(0, 11);
+
     setForm({ ...form, [name]: valor });
+
     if (name === "senha") {
       setSenhaValida({
         maiuscula: /[A-Z]/.test(valor),
@@ -57,24 +59,24 @@ export default function Register() {
     if (name === "nome") return valor.trim().split(" ").length >= 2;
     if (name === "email") return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(valor);
     if (name === "telefone") return valor.length === 11;
-    if (name === "senha") return Object.values(senhaValida).every(Boolean);
+    if (name === "senha")
+      return Object.values(senhaValida).every(Boolean);
     return true;
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const isFormValid = Object.keys(touched).every(key => validarCampo(key));
-    if (!isFormValid) {
+
+    if (!Object.keys(form).every(validarCampo)) {
       setErro("Por favor, preencha todos os campos corretamente.");
-      // Marca todos os campos como "tocados" para exibir os erros
-      setTouched({ nome: true, email: true, telefone: true, senha: true });
       return;
     }
+
     setErro("");
     setLoading(true);
+
     try {
       await axios.post(`${import.meta.env.VITE_API_URL}/user/register`, form);
-      toast.success('Conta criada com sucesso! Por favor, faça o login.');
       navigate("/login");
     } catch (error) {
       if (error.response) {
@@ -86,95 +88,115 @@ export default function Register() {
       setLoading(false);
     }
   };
-  // --- FIM DA SUA LÓGICA PRESERVADA ---
 
   return (
-    // MUDANÇA 1: Aplicando o novo layout e fundo
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-slate-900 via-slate-800 to-slate-700 px-4 text-white">
-      <div className="mb-8">
-        <Link to="/home" aria-label="Voltar para a página inicial da JWT House">
-          <Logo />
-        </Link>
-      </div>
-
-      <div className="w-full max-w-md p-6 sm:p-8 bg-slate-800/50 backdrop-blur-lg rounded-2xl shadow-2xl border border-slate-700">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-center text-white mb-6">
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-purple-500 via-pink-500 to-red-400 px-4">
+      <div className="w-full max-w-md p-6 sm:p-8 bg-white/90 backdrop-blur-lg rounded-2xl shadow-2xl">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-center text-gray-800 mb-6">
           Criar Conta
         </h1>
 
-        <form className="space-y-4" onSubmit={handleSubmit} noValidate>
+        <form className="space-y-5" onSubmit={handleSubmit}>
           {erro && (
-            <p className="text-center text-red-400 text-sm font-medium bg-red-500/10 py-2 rounded-md border border-red-500/30">
+            <p className="text-center text-red-500 text-sm font-medium bg-red-100 py-2 rounded-md">
               {erro}
             </p>
           )}
 
-          {/* MUDANÇA 2: Aplicando o novo estilo aos inputs, mantendo a lógica de validação */}
-          <div>
-            <input
-              type="text" name="nome" value={form.nome} onChange={handleChange} onBlur={handleBlur} placeholder="Nome completo" required
-              className={`w-full px-4 py-3 bg-slate-700/50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 transition ${
-                touched.nome && !validarCampo("nome") ? "border-red-500 text-red-400" : "border-slate-600"
-              }`}
-            />
-            {touched.nome && !validarCampo("nome") && (
-              <p className="text-red-400 text-xs mt-1 pl-1">Informe nome e sobrenome.</p>
-            )}
-          </div>
+          {/* Nome */}
+          <input
+            type="text"
+            name="nome"
+            value={form.nome}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            placeholder="Nome completo"
+            className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+              touched.nome && !validarCampo("nome") ? "border-red-500" : "border-gray-300"
+            }`}
+            required
+          />
+          {touched.nome && !validarCampo("nome") && (
+            <p className="text-red-500 text-sm">Informe nome e sobrenome.</p>
+          )}
 
-          <div>
-            <input
-              type="email" name="email" value={form.email} onChange={handleChange} onBlur={handleBlur} placeholder="Email" required
-              className={`w-full px-4 py-3 bg-slate-700/50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 transition ${
-                touched.email && !validarCampo("email") ? "border-red-500 text-red-400" : "border-slate-600"
-              }`}
-            />
-            {touched.email && !validarCampo("email") && (
-              <p className="text-red-400 text-xs mt-1 pl-1">Informe um email válido.</p>
-            )}
-          </div>
+          {/* Email */}
+          <input
+            type="email"
+            name="email"
+            value={form.email}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            placeholder="Email"
+            className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+              touched.email && !validarCampo("email") ? "border-red-500" : "border-gray-300"
+            }`}
+            required
+          />
+          {touched.email && !validarCampo("email") && (
+            <p className="text-red-500 text-sm">Informe um email válido.</p>
+          )}
 
-          <div>
-            <input
-              type="text" name="telefone" value={form.telefone} onChange={handleChange} onBlur={handleBlur} placeholder="Telefone (somente números)" maxLength="11" required
-              className={`w-full px-4 py-3 bg-slate-700/50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 transition ${
-                touched.telefone && !validarCampo("telefone") ? "border-red-500 text-red-400" : "border-slate-600"
-              }`}
-            />
-            {touched.telefone && !validarCampo("telefone") && (
-              <p className="text-red-400 text-xs mt-1 pl-1">Telefone deve ter 11 dígitos.</p>
-            )}
-          </div>
+          {/* Telefone */}
+          <input
+            type="text"
+            name="telefone"
+            value={form.telefone}
+            onChange={handleChange}
+            onBlur={handleBlur}
+            placeholder="Telefone (somente números)"
+            className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+              touched.telefone && !validarCampo("telefone") ? "border-red-500" : "border-gray-300"
+            }`}
+            required
+          />
+          {touched.telefone && !validarCampo("telefone") && (
+            <p className="text-red-500 text-sm">Telefone deve ter 11 dígitos.</p>
+          )}
 
+          {/* Senha */}
           <div className="relative">
             <input
-              type={mostrarSenha ? "text" : "password"} name="senha" value={form.senha} onChange={handleChange} onBlur={handleBlur} placeholder="Senha" required
-              className={`w-full px-4 py-3 bg-slate-700/50 border rounded-xl focus:outline-none focus:ring-2 focus:ring-amber-400 transition ${
-                touched.senha && !validarCampo("senha") ? "border-red-500 text-red-400" : "border-slate-600"
+              type={mostrarSenha ? "text" : "password"}
+              name="senha"
+              value={form.senha}
+              onChange={handleChange}
+              onBlur={handleBlur}
+              placeholder="Senha"
+              className={`w-full px-4 py-3 border rounded-xl focus:outline-none focus:ring-2 focus:ring-purple-500 ${
+                touched.senha && !validarCampo("senha") ? "border-red-500" : "border-gray-300"
               }`}
+              required
             />
-            <button type="button" onClick={() => setMostrarSenha(!mostrarSenha)} className="absolute right-3 top-1/2 transform -translate-y-1/2 text-slate-400 hover:text-white">
+            <button
+              type="button"
+              onClick={() => setMostrarSenha(!mostrarSenha)}
+              className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500 hover:text-gray-700"
+            >
               {mostrarSenha ? <EyeOff size={20} /> : <Eye size={20} />}
             </button>
+            
           </div>
-          {touched.senha && !validarCampo("senha") && (
-            <div className="text-slate-400 flex items-center gap-2 text-xs pl-1">
-              <HelpCircle size={16} className="text-slate-500" />
-              <span>Mín 8 caracteres, com maiúscula, minúscula e número.</span>
+          {!validarCampo("senha") && touched.senha && (
+            <div className="right-10 top-1/2 transform -translate-y-1/2 text-gray-400 flex items-center gap-1">
+              <HelpCircle size={18} />
+              <span className="text-xs text-gray-700 bg-gray-200 rounded px-1 py-0.5">
+                Mín 8 caracteres, maiúscula, minúscula e número
+              </span>
             </div>
           )}
-          
           <button
-            type="submit" disabled={loading}
-            className="w-full py-3 bg-amber-400 text-slate-900 font-bold rounded-xl shadow-md hover:bg-amber-500 transition duration-300 flex items-center justify-center disabled:bg-amber-400/50 disabled:cursor-not-allowed"
+            type="submit"
+            disabled={loading}
+            className="w-full py-3 bg-purple-600 text-white font-semibold rounded-xl shadow-md hover:bg-purple-700 hover:shadow-lg transition flex items-center justify-center"
           >
             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : "Registrar"}
           </button>
         </form>
 
-        <p className="text-sm text-center mt-6 text-slate-300">
+        <p className="text-sm text-center mt-6">
           Já tem conta?{" "}
-          <Link to="/login" className="font-semibold text-amber-400 hover:underline">
+          <Link to="/login" className="text-purple-600 hover:underline">
             Entrar
           </Link>
         </p>
