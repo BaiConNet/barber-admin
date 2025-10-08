@@ -5,7 +5,17 @@ import { useAuth } from "../context/AuthContext";
 import { useNavigate } from "react-router-dom";
 import useNotifications from "../hooks/useNotifications";
 
-export default function Header({ currentPage }) {
+const pageNames = {
+  dashboard: "Dashboard",
+  appointments: "Agendamentos",
+  horarios: "Horarios",
+  clients: "Clientes",
+  services: "Serviços",
+  analytics: "Relatórios",
+  settings: "Configurações",
+};
+
+export default function Header({ currentPage, subTitle }) {
   const { auth, logout } = useAuth();
   const navigate = useNavigate();
   const { notifications, markAsRead } = useNotifications(auth?.user?._id, auth?.token);
@@ -18,14 +28,6 @@ export default function Header({ currentPage }) {
     navigate("/login");
   };
 
-  const handleOpenNotifications = () => {
-    setNotiOpen(!notiOpen);
-    // Marca todas como lidas quando abrir o dropdown
-    notifications
-      .filter(noti => !noti.lida)
-      .forEach(noti => markAsRead(noti._id));
-  };
-
   return (
     <motion.header
       className="bg-gray-800 border-b border-gray-700 px-6 py-2"
@@ -34,19 +36,28 @@ export default function Header({ currentPage }) {
       transition={{ duration: 0.3 }}
     >
       <div className="flex items-center justify-between">
-        <h2 className="text-2xl font-bold text-white">{currentPage || "Dashboard"}</h2>
+        {/* Left side: page title + subtitle */}
+        <div className="flex flex-col">
+          <h2 className="text-2xl font-bold text-white">
+            {pageNames[currentPage] || "Dashboard"}
+          </h2>
+          {subTitle && (
+            <p className="text-gray-400 text-sm mt-1">{subTitle}</p>
+          )}
+        </div>
 
+        {/* Right side */}
         <div className="flex items-center space-x-4">
           {/* Notifications */}
           <div className="relative">
             <button
-              onClick={handleOpenNotifications}
+              onClick={() => setNotiOpen(!notiOpen)}
               className="relative p-2 rounded-lg hover:bg-gray-700 transition-colors"
             >
               <Bell className="w-5 h-5 text-gray-300" />
-              {notifications.some(noti => !noti.lida) && (
+              {notifications.filter((n) => !n.lida).length > 0 && (
                 <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center animate-pulse">
-                  {notifications.filter(noti => !noti.lida).length}
+                  {notifications.filter((n) => !n.lida).length}
                 </span>
               )}
             </button>
@@ -56,30 +67,34 @@ export default function Header({ currentPage }) {
                 {notifications.length === 0 && (
                   <p className="text-gray-300 px-4 py-2">Sem notificações</p>
                 )}
-                {notifications.map((noti, idx) => (
+                {notifications.map((noti) => (
                   <div
-                    key={idx}
-                    className={`px-4 py-2 border-b border-gray-600 text-gray-200 ${
-                      noti.lida ? "opacity-50" : "font-semibold"
-                    }`}
+                    key={noti._id}
+                    onClick={() => markAsRead(noti._id)}
+                    className={`px-4 py-2 border-b border-gray-600 cursor-pointer transition 
+                      ${noti.lida ? "bg-gray-700 hover:bg-gray-600" : "bg-gray-600 hover:bg-gray-500"}`}
                   >
-                    <p className="text-sm">{noti.title}</p>
-                    <p className="text-xs">{noti.message}</p>
+                    {noti.title && <p className="font-semibold">{noti.title}</p>}
+                    <p className="text-sm">{noti.message}</p>
                   </div>
                 ))}
               </div>
             )}
           </div>
 
-          {/* Profile */}
+          {/* Profile Dropdown */}
           <div className="relative">
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               className="flex items-center space-x-3 hover:opacity-80 transition"
             >
               <div className="hidden md:block text-right">
-                <p className="text-sm font-medium text-white">{auth?.user?.nome}</p>
-                <p className="text-xs text-gray-400">{auth?.user?.role}</p>
+                <p className="text-sm font-medium text-white">
+                  {auth?.user?.nome || "Usuário"}
+                </p>
+                <p className="text-xs text-gray-400">
+                  {auth?.user?.role || "Perfil"}
+                </p>
               </div>
               <div className="w-8 h-8 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full flex items-center justify-center">
                 <User className="w-4 h-4 text-white" />

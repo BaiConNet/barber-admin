@@ -22,5 +22,5 @@ export default function usePainelDashboard(token) {
       .finally(() => setLoading(false))
   }, [token])
 
-  return { data, loading, error }
+  return { data, setData, loading, error }
 }

@@ -5,6 +5,7 @@ import Dashboard from "../pages/AdminDashboardPage/Dashboard.jsx";
 import Servicos from "../pages/AdminDashboardPage/Servicos.jsx";
 import Horarios from "../pages/AdminDashboardPage/Horarios.jsx";
 import Appointments from "../pages/AppointmentsPage/Appointments.jsx"
+import Configuracoes from "../pages/AdminDashboardPage/Configuracoes.jsx";
 import Register from "../pages/registerPage/Register.jsx";
 import ForgotPassword from "../pages/ForgotPasswordPage/ForgotPassword.jsx";
 import ResetPassword from "../pages/ResetPasswordPage/ResetPassword.jsx";
@@ -57,14 +58,24 @@ export default function AppRoutes() {
         path="/horarios"
         element={
           <PrivateRoute>
-            <PrivateLayout>
+            <PrivateLayout currentPage="horarios" subTitle="Crie seus horarios da barbearia">
               <Horarios />
             </PrivateLayout>
           </PrivateRoute>
         }
       />
 
-      <Route path="*" element={<Navigate to="/login" />} />
+      <Route
+        path="/configuracoes"
+        element={
+          <PrivateRoute>
+            <PrivateLayout currentPage="configuracoes" subTitle="Gerencie as configurações da sua barbearia">
+              <Configuracoes />
+            </PrivateLayout>
+          </PrivateRoute>
+        }
+      />
+      <Route path="*" element={<Navigate to="/home" />} />
     </Routes>
   );
 }
