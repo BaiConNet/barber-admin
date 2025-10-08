@@ -16,7 +16,7 @@ export default function PrivateLayout({ children, currentPage, subTitle }) {
         <Header sidebarOpen={isOpen} setSidebarOpen={setIsOpen} currentPage={currentPage} subTitle={subTitle} />
 
         {/* Page content */}
-        <main className="flex-1 p-4 p-6 overflow-auto bg-barber-card min-h-[calc(100vh-64px)]">
+        <main className="grid grid-cols-1 flex-1 p-4 p-6 overflow-auto bg-barber-card min-h-[calc(100vh-64px)]">
           {children}
         </main>
       </div>
