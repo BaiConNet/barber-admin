@@ -1,15 +1,14 @@
 // src/components/Sidebar.jsx
 import React from 'react';
 import { motion } from 'framer-motion';
-import { LayoutDashboard, Calendar, Users, Scissors, BarChart3, Settings, ChevronLeft, ChevronRight } from 'lucide-react';
+import { LayoutDashboard, Calendar, Scissors, Settings, ChevronLeft, ChevronRight, Clock } from 'lucide-react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
 const menuItems = [
   { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard, path: '/dashboard' },
   { id: 'appointments', label: 'Agendamentos', icon: Calendar, path: '/agendamentos' },
-  { id: 'clients', label: 'Clientes', icon: Users, path: '/clientes' },
+  { id: 'horarios', label: 'Horarios', icon: Clock, path: '/horarios' },
   { id: 'services', label: 'Serviços', icon: Scissors, path: '/servicos' },
-  { id: 'analytics', label: 'Relatórios', icon: BarChart3, path: '/relatorios' },
   { id: 'settings', label: 'Configurações', icon: Settings, path: '/configuracoes' },
 ];
 
